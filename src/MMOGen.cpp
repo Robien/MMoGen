@@ -6,15 +6,37 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
+#include <net/TestTCPClient.h>
+#include <net/TestTCPServer.h>
 #include <iostream>
 #include "net/TestTcp.h"
 
-using namespace std;
-
-int main()
+int main(int argc, char* argv[])
 {
-	TestTcp testTcp;
-	testTcp.run();
+//	TestTcp testTcp;
+//	testTcp.run();
+	if (argc > 1)
+	{
+		TestTCPServer server;
+		server.run();
+	}
+	else
+	{
+		TestTCPClient client;
+		client.start();
+
+		for (;;)
+		{
+			char data[256];
+
+			std::cout << "message : ";
+			std::cin.getline(data, 256);
+
+			client.getManager()->sendMessage(NetworkMessageOut::factory(0, data));
+
+		}
+	}
 
 	return 0;
 }
+

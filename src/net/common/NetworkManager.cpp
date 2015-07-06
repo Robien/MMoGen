@@ -24,6 +24,8 @@ void NetworkManager::newIncommingMessage(boost::shared_ptr<NetworkMessage> messa
 // 	std::cout.write(&(*message->getData())[0], message->getDataSize());
 //	std::cout << std::endl;
 
+	message->getData()->at(message->getDataSize())= '\0';
+
 	NetworkEventManager::get()->onMessage(message);
 
 }
