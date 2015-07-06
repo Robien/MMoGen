@@ -54,6 +54,7 @@ void ClientConnectAndPrint::handle_read(const boost::system::error_code& error, 
 {
 	if (!error)
 	{
+		std::cout << "[CLIENT] receive a message : " << std::endl;
 		std::cout.write(&network_buffer[0], number_bytes_read);
 		std::cout << std::endl;
 

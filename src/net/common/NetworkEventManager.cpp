@@ -23,3 +23,11 @@ void NetworkEventManager::onEvent(NetworkEvent event)
 		(*itt)->onEvent(event);
 	}
 }
+
+void NetworkEventManager::onMessage(boost::shared_ptr<NetworkMessage> message)
+{
+	for (std::vector<NetworkEventReceiver*>::const_iterator itt = receivers.begin(); itt != receivers.end(); itt++)
+	{
+		(*itt)->onMessageReceived(message);
+	}
+}

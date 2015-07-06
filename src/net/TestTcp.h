@@ -8,6 +8,7 @@
 #ifndef TESTTCP_H_
 #define TESTTCP_H_
 
+#include <boost/asio.hpp>
 #include <net/common/NetworkEventReceiver.h>
 #include "tcp/server/ServerListener.h"
 #include "tcp/client/ClientConnectAndPrint.h"
@@ -22,6 +23,7 @@ public:
 	void run();
 public:
 	void onEvent(NetworkEvent event);
+	void onMessageReceived(boost::shared_ptr<NetworkMessage> message);
 
 private:
 	NetworkManager manager;

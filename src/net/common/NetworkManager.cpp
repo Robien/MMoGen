@@ -20,8 +20,12 @@ NetworkManager::~NetworkManager()
 }
 void NetworkManager::newIncommingMessage(boost::shared_ptr<NetworkMessage> message)
 {
-	std::cout.write(&(*message->getData())[0], message->getDataSize());
-	std::cout << std::endl;
+//	std::cout << "YOO" << std::endl;
+// 	std::cout.write(&(*message->getData())[0], message->getDataSize());
+//	std::cout << std::endl;
+
+	NetworkEventManager::get()->onMessage(message);
+
 }
 int NetworkManager::getNewId()
 {

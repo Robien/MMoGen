@@ -9,6 +9,8 @@
 #define NETWORKEVENTMANAGER_H_
 
 #include <net/common/NetworkEventReceiver.h>
+#include <net/common/NetworkMessage.h>
+#include <shared_ptr.h>
 #include <vector>
 
 #include "Singleton.h"
@@ -23,6 +25,7 @@ public:
 
 public:
 	void onEvent(NetworkEvent event);
+	void onMessage(boost::shared_ptr<NetworkMessage> message);
 
 private:
 	std::vector<NetworkEventReceiver*> receivers;

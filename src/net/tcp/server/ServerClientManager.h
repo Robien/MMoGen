@@ -20,7 +20,6 @@ public:
 public:
 	void newClient(boost::asio::ip::tcp::socket* socket);
 
-
 private:
 	NetworkManager* manager;
 };
