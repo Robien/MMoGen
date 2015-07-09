@@ -6,7 +6,6 @@
  */
 
 #include <net/common/NetworkMessageOut.h>
-#include <proto/src/addressbook.pb.h>
 
 NetworkMessageOut::NetworkMessageOut(unsigned int receiverId, boost::shared_ptr<std::string> data) :
 		receiver(receiverId), data(data)
