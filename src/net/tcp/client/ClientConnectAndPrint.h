@@ -36,7 +36,7 @@ private:
 	boost::asio::io_service& ios_service;
 	boost::asio::ip::tcp::endpoint endpoint;
 	boost::asio::ip::tcp::socket socket;
-	boost::array<char, 4096> network_buffer;
+	boost::array<char, MAX_SIZE_PACKET> network_buffer;
 	boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > messagesToSend;
 	NetworkManager* manager;
 };

@@ -54,9 +54,15 @@ void ClientConnectAndPrint::handle_read(const boost::system::error_code& error, 
 {
 	if (!error)
 	{
-		std::cout << "[CLIENT] receive a message : " << std::endl;
-		std::cout.write(&network_buffer[0], number_bytes_read);
-		std::cout << std::endl;
+//		std::cout << "[CLIENT] receive a message : " << std::endl;
+//		std::cout.write(&network_buffer[0], number_bytes_read);
+//		std::cout << std::endl;
+
+		boost::shared_ptr<boost::array<char, MAX_SIZE_PACKET> > data(new boost::array<char, MAX_SIZE_PACKET>());
+		*data = network_buffer;
+		boost::shared_ptr<NetworkMessage> message(new NetworkMessage(0, number_bytes_read, data));
+
+		manager->newIncommingMessage(message);
 
 		readHeader();
 	}

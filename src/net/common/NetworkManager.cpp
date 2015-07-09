@@ -18,17 +18,14 @@ NetworkManager::NetworkManager(bool isServer) :
 NetworkManager::~NetworkManager()
 {
 }
+
 void NetworkManager::newIncommingMessage(boost::shared_ptr<NetworkMessage> message)
 {
-//	std::cout << "YOO" << std::endl;
-// 	std::cout.write(&(*message->getData())[0], message->getDataSize());
-//	std::cout << std::endl;
-
-	message->getData()->at(message->getDataSize())= '\0';
-
+	//TODO : useful only with ASCII message
+	message->getData()->at(message->getDataSize()) = '\0';
 	NetworkEventManager::get()->onMessage(message);
-
 }
+
 int NetworkManager::getNewId()
 {
 	mutexId.lock();
@@ -52,6 +49,7 @@ void NetworkManager::removeId(unsigned int id)
 	removeIdNS(id);
 	mutexId.unlock();
 }
+
 void NetworkManager::removeIdNS(unsigned int id)
 {
 	if (id + 1 == maxId)

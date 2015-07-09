@@ -31,7 +31,7 @@ void TestTCPClient::run()
 
 void TestTCPClient::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
-	std::cout << "YOO : " << message->getSenderId() << std::endl;
+	std::cout << "YOO client : " << message->getSenderId() << std::endl;
 //	std::cout.write(&(*message->getData())[0], message->getDataSize());
 //
 //	manager.sendMessage(NetworkMessageOut::factory(message->getSenderId(), message->getData()->c_array()));

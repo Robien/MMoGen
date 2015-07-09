@@ -13,8 +13,6 @@
 
 int main(int argc, char* argv[])
 {
-//	TestTcp testTcp;
-//	testTcp.run();
 	if (argc > 1)
 	{
 		TestTCPServer server;
