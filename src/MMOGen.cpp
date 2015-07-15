@@ -7,33 +7,48 @@
 //============================================================================
 
 #include <net/TestTCPClient.h>
+#include <net/TestTCPLoginClient.h>
 #include <net/TestTCPServer.h>
 #include <iostream>
 #include "net/TestTcp.h"
 
+#include "net/game/LoginServer.h"
+
 int main(int argc, char* argv[])
 {
+
 	if (argc > 1)
 	{
-		TestTCPServer server;
-		server.run();
+		LoginServer server;
+		server.listen();
 	}
 	else
 	{
-		TestTCPClient client;
-		client.start();
-
-		for (;;)
-		{
-			char data[256];
-
-			std::cout << "message : ";
-			std::cin.getline(data, 256);
-
-			client.getManager()->sendMessage(NetworkMessageOut::factory(0, data));
-
-		}
+		TestTCPLoginClient client;
+		client.run();
 	}
+
+//	if (argc > 1)
+//	{
+//		TestTCPServer server;
+//		server.run();
+//	}
+//	else
+//	{
+//		TestTCPClient client;
+//		client.start();
+//
+//		for (;;)
+//		{
+//			char data[256];
+//
+//			std::cout << "message : ";
+//			std::cin.getline(data, 256);
+//
+//			client.getManager()->sendMessage(NetworkMessageOut::factory(0, data));
+//
+//		}
+//	}
 
 	return 0;
 }

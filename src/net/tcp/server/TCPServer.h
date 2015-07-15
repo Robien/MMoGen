@@ -8,8 +8,11 @@
 #ifndef TCPSERVER_H_
 #define TCPSERVER_H_
 
+#include <boost/asio.hpp>
 #include "net/common/NetworkEventReceiver.h"
 #include "net/common/NetworkManager.h"
+
+#include "ServerListener.h"
 
 class TCPServer : public NetworkEventReceiver
 {
@@ -24,8 +27,13 @@ public:
 	public:
 		void listen();
 
+	protected:
+		ServerListener* getServerEndpoint();
+		NetworkManager& getManager();
+
 	private:
 		NetworkManager manager;
+		ServerListener* server;
 };
 
 #endif /* TCPSERVER_H_ */

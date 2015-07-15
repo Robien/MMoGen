@@ -7,11 +7,11 @@
 
 #include "net/tcp/server/TCPServer.h"
 #include "net/common/NetworkEventManager.h"
-#include "net/tcp/server/ServerListener.h"
 
 TCPServer::TCPServer()
 {
 	NetworkEventManager::get()->addEventReceiver(this);
+	server = NULL;
 }
 
 TCPServer::~TCPServer()
@@ -21,9 +21,19 @@ TCPServer::~TCPServer()
 void TCPServer::listen()
 {
 		boost::asio::io_service io;
-		ServerListener server(io, 12345, &manager);
+		server = new ServerListener(io, 12345, &manager);
 
-		server.listen();
+		server->listen();
 
 		io.run();
+}
+
+ServerListener* TCPServer::getServerEndpoint()
+{
+	return server;
+}
+
+NetworkManager& TCPServer::getManager()
+{
+	return manager;
 }

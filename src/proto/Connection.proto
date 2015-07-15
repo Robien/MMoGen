@@ -1,0 +1,48 @@
+package Connection;
+
+message MessageClientType
+{
+	enum messageClientType
+	{
+		MM = 0;
+		Ready = 1;
+	}
+}
+
+message MessageServerType
+{
+	enum messageServerType
+	{
+		ACKMM = 0;
+		MatchFound = 1;
+	}
+}
+
+message MM 
+{
+
+	enum MMCommandType
+	{
+		START = 0;
+		STOP = 1;
+	}
+
+	required int32 versionMajor = 1;
+	required int32 versionMinor = 2;
+
+	optional MMCommandType command = 3 [default = START];
+	optional int32 Elo = 4 [default = 0];
+}
+
+message ACKMM
+{
+	required bool isOk = 1;
+}
+
+message MatchFound
+{
+}
+
+message Ready
+{
+}
