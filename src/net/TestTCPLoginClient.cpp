@@ -48,6 +48,15 @@ void TestTCPLoginClient::onMessageReceived(boost::shared_ptr<NetworkMessage> mes
 	{
 		sendReady();
 	}
+	else if (status == 2)
+	{
+		std::cout << "INGAME !!!" << std::endl;
+		manager.sendMessage(NetworkMessageOut::factory(0, "Salut les amis !"));
+	}
+	else if (status > 2)
+	{
+		std::cout << "get message : " << message->getData() << " from id: " << message->getSenderId() << std::endl;
+	}
 	status++;
 
 }

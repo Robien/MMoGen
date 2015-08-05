@@ -46,3 +46,7 @@ message MatchFound
 message Ready
 {
 }
+
+message StartGame
+{
+}

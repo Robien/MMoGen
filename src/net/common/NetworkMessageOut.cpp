@@ -35,3 +35,9 @@ boost::shared_ptr<NetworkMessageOut> NetworkMessageOut::factory(unsigned int rec
 	boost::shared_ptr<NetworkMessageOut> m(new NetworkMessageOut(receiverId, dataS));
 	return m;
 }
+boost::shared_ptr<NetworkMessageOut> NetworkMessageOut::factory(boost::shared_ptr<NetworkMessage> messageIn)
+{
+	boost::shared_ptr<std::string> dataS(new std::string(messageIn->getData()->begin(), messageIn->getData()->begin() + messageIn->getDataSize()));
+	boost::shared_ptr<NetworkMessageOut> m(new NetworkMessageOut(messageIn->getSenderId(), dataS));
+	return m;
+}

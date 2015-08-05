@@ -88,6 +88,7 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		case loginServer::Client::INGAME:
 			std::cout << "status : INGAME" << std::endl;
+			getManager().sendMessage(NetworkMessageOut::factory(message));
 			break;
 		case loginServer::Client::DISCONNECTED:
 			std::cout << "status : DISCONNECTED" << std::endl;
@@ -171,8 +172,18 @@ void LoginServer::sendMFMessage(unsigned int id)
 	getManager().sendMessage(NetworkMessageOut::factory(id, mfStr));
 }
 
+void LoginServer::sendStartGame(unsigned int id)
+{
+	Connection::StartGame sg;
+
+	std::string sgStr = sg.SerializeAsString();
+	getManager().sendMessage(NetworkMessageOut::factory(id, sgStr));
+}
+
 void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player1,
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player2)
 {
+	sendStartGame(player1->second->getId());
+	sendStartGame(player2->second->getId());
 	std::cout << "starting game with id : " << player1->second->getId() << " and id : " << player2->second->getId() << std::endl;
 }

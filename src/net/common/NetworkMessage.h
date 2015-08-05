@@ -9,6 +9,7 @@
 #define NETWORKMESSAGE_H_
 
 #include <boost/asio.hpp>
+#include <iostream>
 
 #include "networkConf.h"
 

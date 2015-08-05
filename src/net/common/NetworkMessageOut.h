@@ -9,6 +9,7 @@
 #define NETWORKMESSAGEOUT_H_
 
 #include <boost/asio.hpp>
+#include <net/common/NetworkMessage.h>
 #include <iostream>
 #include <vector>
 
@@ -24,6 +25,7 @@ public:
 
 public:
 	static boost::shared_ptr<NetworkMessageOut> factory(unsigned int receiverId, std::string data);
+	static boost::shared_ptr<NetworkMessageOut> factory(boost::shared_ptr<NetworkMessage> messageIn);
 
 private:
 	unsigned int receiver;

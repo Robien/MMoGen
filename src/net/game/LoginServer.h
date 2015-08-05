@@ -31,6 +31,7 @@ private:
 	void computeREADYMessage(boost::shared_ptr<NetworkMessage> message,
 			std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client);
 	void sendMFMessage(unsigned int id);
+	void sendStartGame(unsigned int id);
 
 private:
 
