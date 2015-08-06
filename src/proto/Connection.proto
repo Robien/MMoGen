@@ -2,7 +2,7 @@ package Connection;
 
 message MessageClientType
 {
-	enum messageClientType
+	enum EMessageClientType
 	{
 		MM = 0;
 		Ready = 1;
@@ -11,7 +11,7 @@ message MessageClientType
 
 message MessageServerType
 {
-	enum messageServerType
+	enum EMessageServerType
 	{
 		ACKMM = 0;
 		MatchFound = 1;
@@ -21,7 +21,7 @@ message MessageServerType
 message MM 
 {
 
-	enum MMCommandType
+	enum EMMCommandType
 	{
 		START = 0;
 		STOP = 1;
@@ -30,7 +30,7 @@ message MM
 	required int32 versionMajor = 1;
 	required int32 versionMinor = 2;
 
-	optional MMCommandType command = 3 [default = START];
+	optional EMMCommandType command = 3 [default = START];
 	optional int32 Elo = 4 [default = 0];
 }
 

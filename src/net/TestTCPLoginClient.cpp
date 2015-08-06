@@ -82,7 +82,7 @@ void TestTCPLoginClient::startMM()
 {
 	Connection::MM mm;
 
-	mm.set_command(Connection::MM_MMCommandType_START);
+	mm.set_command(Connection::MM_EMMCommandType_START);
 	mm.set_elo(0);
 	mm.set_versionmajor(0);
 	mm.set_versionminor(0);
