@@ -172,9 +172,11 @@ void LoginServer::sendMFMessage(unsigned int id)
 	getManager().sendMessage(NetworkMessageOut::factory(id, mfStr));
 }
 
-void LoginServer::sendStartGame(unsigned int id)
+void LoginServer::sendStartGame(unsigned int id, bool isMain)
 {
 	Connection::StartGame sg;
+
+	sg.set_ismain(isMain);
 
 	std::string sgStr = sg.SerializeAsString();
 	getManager().sendMessage(NetworkMessageOut::factory(id, sgStr));
@@ -183,7 +185,7 @@ void LoginServer::sendStartGame(unsigned int id)
 void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player1,
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player2)
 {
-	sendStartGame(player1->second->getId());
-	sendStartGame(player2->second->getId());
+	sendStartGame(player1->second->getId(), true);
+	sendStartGame(player2->second->getId(), false);
 	std::cout << "starting game with id : " << player1->second->getId() << " and id : " << player2->second->getId() << std::endl;
 }
