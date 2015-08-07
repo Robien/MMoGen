@@ -8,7 +8,7 @@
 #include "net/tcp/server/TCPServer.h"
 #include "net/common/NetworkEventManager.h"
 
-TCPServer::TCPServer()
+TCPServer::TCPServer(unsigned int port) : port(port)
 {
 	NetworkEventManager::get()->addEventReceiver(this);
 	server = NULL;
@@ -21,7 +21,7 @@ TCPServer::~TCPServer()
 void TCPServer::listen()
 {
 		boost::asio::io_service io;
-		server = new ServerListener(io, 12345, &manager);
+		server = new ServerListener(io, port, &manager);
 
 		server->listen();
 

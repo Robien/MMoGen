@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lboost_system -lpthread -lprotobuf -lboost_thread
+LIBS := -lboost_system -lpthread -lprotobuf -lboost_thread -lboost_program_options
 

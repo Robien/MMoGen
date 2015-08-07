@@ -17,7 +17,7 @@
 class TCPServer : public NetworkEventReceiver
 {
 public:
-	TCPServer();
+	TCPServer(unsigned int port);
 	virtual ~TCPServer();
 
 	public:
@@ -34,6 +34,9 @@ public:
 	private:
 		NetworkManager manager;
 		ServerListener* server;
+
+	private:
+		unsigned int port;
 };
 
 #endif /* TCPSERVER_H_ */

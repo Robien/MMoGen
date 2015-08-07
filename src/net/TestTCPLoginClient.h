@@ -12,15 +12,17 @@
 #include <net/common/NetworkEvent.h>
 #include <net/common/NetworkEventReceiver.h>
 #include <net/common/NetworkMessage.h>
+#include <time/Timer.h>
+#include <time/TimerCaller.h>
 
 #include "net/common/NetworkManager.h"
 
 #include "thread/Thread.h"
 
-class TestTCPLoginClient : public NetworkEventReceiver, public Thread
+class TestTCPLoginClient : public NetworkEventReceiver, public Thread, public TimerCallerCB
 {
 public:
-	TestTCPLoginClient();
+	TestTCPLoginClient(std::string host, unsigned int port);
 	virtual ~TestTCPLoginClient();
 
 public:
@@ -31,10 +33,23 @@ public:
 private:
 	void startMM();
 	void sendReady();
+	void sendPingMessage();
+	void sendPongMessage(unsigned int id);
+	void timedCall();
+	void computeInGameMessage(boost::shared_ptr<NetworkMessage> message);
 
 private:
 	NetworkManager manager;
 	int status;
+
+private:
+	unsigned int pingId;
+	Timer timerPing;
+	TimerCaller timerCaller;
+
+private:
+	std::string host;
+	unsigned int port;
 };
 
 #endif /* TESTTCPLOGINCLIENT_H_ */

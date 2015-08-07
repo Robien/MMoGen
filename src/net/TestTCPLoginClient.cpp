@@ -7,15 +7,18 @@
 
 #include <net/common/NetworkEventManager.h>
 #include <net/TestTCPLoginClient.h>
+#include <proto/src/Game.pb.h>
+#include <unistd.h>
 
 #include "tcp/client/ClientConnectAndPrint.h"
 #include "proto/src/Connection.pb.h"
 
-TestTCPLoginClient::TestTCPLoginClient()
+TestTCPLoginClient::TestTCPLoginClient(std::string host, unsigned int port) : host(host), port(port)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	NetworkEventManager::get()->addEventReceiver(this);
 	status = 0;
+	pingId = 0;
 }
 
 TestTCPLoginClient::~TestTCPLoginClient()
@@ -25,7 +28,12 @@ TestTCPLoginClient::~TestTCPLoginClient()
 void TestTCPLoginClient::run()
 {
 	boost::asio::io_service io;
-	ClientConnectAndPrint client(io, "127.0.0.1", 12345, &manager);
+	boost::asio::ip::tcp::resolver resolver(io);
+	boost::asio::ip::tcp::resolver::query query(host, "");
+	boost::asio::ip::tcp::resolver::iterator i = resolver.resolve(query);
+	boost::asio::ip::tcp::endpoint end = *i;
+
+	ClientConnectAndPrint client(io, end.address().to_string(), port, &manager);
 
 	client.connect();
 
@@ -34,12 +42,11 @@ void TestTCPLoginClient::run()
 
 void TestTCPLoginClient::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
-	std::cout << "YOO client : " << message->getSenderId() << std::endl;
 //	std::cout.write(&(*message->getData())[0], message->getDataSize());
 //
 //	manager.sendMessage(NetworkMessageOut::factory(message->getSenderId(), message->getData()->c_array()));
 //	std::cout << std::endl;
-	std::cout << "status : " << status << std::endl;
+//	std::cout << "status : " << status << std::endl;
 
 	if (status == 0)
 	{
@@ -51,11 +58,12 @@ void TestTCPLoginClient::onMessageReceived(boost::shared_ptr<NetworkMessage> mes
 	else if (status == 2)
 	{
 		std::cout << "INGAME !!!" << std::endl;
-		manager.sendMessage(NetworkMessageOut::factory(0, "Salut les amis !"));
+
+		timerCaller.callMeIn(this, 1000);
 	}
 	else if (status > 2)
 	{
-		std::cout << "get message : " << message->getData() << " from id: " << message->getSenderId() << std::endl;
+		computeInGameMessage(message);
 	}
 	status++;
 
@@ -95,3 +103,59 @@ void TestTCPLoginClient::sendReady()
 
 	manager.sendMessage(NetworkMessageOut::factory(0, r.SerializeAsString()));
 }
+
+void TestTCPLoginClient::sendPingMessage()
+{
+	Game::MessageType message;
+	Game::Ping* ping = new Game::Ping();
+
+	ping->set_id(pingId);
+
+	message.set_type(Game::MessageType_EMessageType_PING);
+	message.set_allocated_ping(ping);
+
+	timerPing.start();
+	manager.sendMessage(NetworkMessageOut::factory(0, message.SerializeAsString()));
+
+	pingId++;
+
+}
+void TestTCPLoginClient::sendPongMessage(unsigned int id)
+{
+	Game::MessageType message;
+	Game::Pong* pong = new Game::Pong();
+
+	pong->set_id(id);
+
+	message.set_type(Game::MessageType_EMessageType_PONG);
+	message.set_allocated_pong(pong);
+
+	manager.sendMessage(NetworkMessageOut::factory(0, message.SerializeAsString()));
+}
+
+void TestTCPLoginClient::timedCall()
+{
+	sendPingMessage();
+}
+
+void TestTCPLoginClient::computeInGameMessage(boost::shared_ptr<NetworkMessage> message)
+{
+	Game::MessageType messageType;
+
+	messageType.ParseFromArray(message->getData()->c_array(), message->getDataSize());
+
+	if (messageType.type() == Game::MessageType::PING)
+	{
+		sendPongMessage(messageType.pong().id());
+	}
+	else if (messageType.type() == Game::MessageType::PONG)
+	{
+		std::cout << "ping : " << timerPing.getValueinMilliSecond() << "ms" << std::endl;
+		timerCaller.callMeIn(this, 1000);
+	}
+	else
+	{
+		std::cout << "what ?" << std::endl;
+	}
+}
+

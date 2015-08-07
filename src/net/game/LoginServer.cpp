@@ -9,7 +9,7 @@
 
 #include "proto/src/Connection.pb.h"
 
-LoginServer::LoginServer()
+LoginServer::LoginServer(unsigned int port) : TCPServer(port)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 }
@@ -59,7 +59,7 @@ void LoginServer::onEvent(NetworkEvent event)
 }
 void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
-	std::cout << "received a message from id " << message->getSenderId();
+	std::cout << "received a message from id " << message->getSenderId() << std::endl;
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client = clients.find(message->getSenderId());
 
 	if (client == clients.end())

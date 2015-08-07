@@ -18,7 +18,7 @@
 class LoginServer: public TCPServer
 {
 public:
-	LoginServer();
+	LoginServer(unsigned int port);
 	virtual ~LoginServer();
 
 public:
