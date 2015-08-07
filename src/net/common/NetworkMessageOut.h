@@ -22,6 +22,8 @@ public:
 	boost::shared_ptr<std::string> getData();
 	boost::shared_ptr<std::vector<char> > getVectorData();
 	unsigned int getReceiverId();
+	void setRaw();
+	bool isRaw();
 
 public:
 	static boost::shared_ptr<NetworkMessageOut> factory(unsigned int receiverId, std::string data);
@@ -31,6 +33,7 @@ public:
 private:
 	unsigned int receiver;
 	boost::shared_ptr<std::string> data;
+	bool raw;
 };
 
 #endif /* NETWORKMESSAGEOUT_H_ */

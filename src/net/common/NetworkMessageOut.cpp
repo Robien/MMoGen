@@ -8,7 +8,7 @@
 #include <net/common/NetworkMessageOut.h>
 
 NetworkMessageOut::NetworkMessageOut(unsigned int receiverId, boost::shared_ptr<std::string> data) :
-		receiver(receiverId), data(data)
+		receiver(receiverId), data(data), raw(false)
 {
 }
 
@@ -47,3 +47,12 @@ boost::shared_ptr<NetworkMessageOut> NetworkMessageOut::factory(boost::shared_pt
 	boost::shared_ptr<NetworkMessageOut> m(new NetworkMessageOut(receiverId, dataS));
 	return m;
 }
+void NetworkMessageOut::setRaw()
+{
+	raw = true;
+}
+bool NetworkMessageOut::isRaw()
+{
+	return raw;
+}
+

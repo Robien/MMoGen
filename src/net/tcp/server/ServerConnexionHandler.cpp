@@ -33,14 +33,18 @@ void ServerConnexionHandler::run()
 
 		boost::shared_ptr<NetworkMessageOut> message = messagesToSend->get();
 
-		unsigned int value = message->getData()->size();
-		std::string msgSize;
-		msgSize.push_back((value >> 24) & 0xFF);
-		msgSize.push_back((value >> 16) & 0xFF);
-		msgSize.push_back((value >> 8) & 0xFF);
-		msgSize.push_back((value) & 0xFF);
 
-		socket->send(boost::asio::buffer(msgSize));
+		if (!message->isRaw())
+		{
+			unsigned int value = message->getData()->size();
+			std::string msgSize;
+			msgSize.push_back((value >> 24) & 0xFF);
+			msgSize.push_back((value >> 16) & 0xFF);
+			msgSize.push_back((value >> 8) & 0xFF);
+			msgSize.push_back((value) & 0xFF);
+
+			socket->send(boost::asio::buffer(msgSize));
+		}
 		socket->send(boost::asio::buffer(*message->getData()));
 
 //	readHeader();

@@ -39,18 +39,21 @@ void UnityPolicyServer::onMessageReceived(boost::shared_ptr<NetworkMessage> mess
 void UnityPolicyServer::onEvent(NetworkEvent event)
 {
 
-std::string message = "<?xml version=\"1.0\"?>\n";
-message += "<cross-domain-policy>\n";
-message += "<allow-access-from domain=\"*\" to-ports=\"4242-4242\"/>\n";
-message += "</cross-domain-policy>\n";
+	std::string message = "<?xml version=\"1.0\"?>\n";
+	message += "<cross-domain-policy>\n";
+	message += "<allow-access-from domain=\"*\" to-ports=\"4242-4242\"/>\n";
+	message += "</cross-domain-policy>\n";
 
+	boost::shared_ptr<NetworkMessageOut> messageOut;
 
 	switch (event.typeEvent)
 	{
 	case NetworkEvent::CONNECTION:
 		std::cout << "CONNECTION id :" << event.id << std::endl;
 		std::cout << "send message : " << std::endl << message << std::endl;
-		manager.sendMessage(NetworkMessageOut::factory(event.id, message));
+		messageOut = NetworkMessageOut::factory(event.id, message);
+		messageOut->setRaw();
+		manager.sendMessage(messageOut);
 		break;
 	case NetworkEvent::DISCONECTION:
 		std::cout << "DISCONECTION id :" << event.id << std::endl;
