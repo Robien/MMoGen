@@ -107,12 +107,11 @@ void TestTCPLoginClient::sendReady()
 void TestTCPLoginClient::sendPingMessage()
 {
 	Game::MessageType message;
-	Game::Ping* ping = new Game::Ping();
+	Game::Ping* ping = message.mutable_ping();
 
 	ping->set_id(pingId);
 
 	message.set_type(Game::MessageType_EMessageType_PING);
-	message.set_allocated_ping(ping);
 
 	timerPing.start();
 	manager.sendMessage(NetworkMessageOut::factory(0, message.SerializeAsString()));
@@ -123,12 +122,11 @@ void TestTCPLoginClient::sendPingMessage()
 void TestTCPLoginClient::sendPongMessage(unsigned int id)
 {
 	Game::MessageType message;
-	Game::Pong* pong = new Game::Pong();
+	Game::Pong* pong = message.mutable_pong();
 
 	pong->set_id(id);
 
 	message.set_type(Game::MessageType_EMessageType_PONG);
-	message.set_allocated_pong(pong);
 
 	manager.sendMessage(NetworkMessageOut::factory(0, message.SerializeAsString()));
 }
