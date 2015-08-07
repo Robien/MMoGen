@@ -11,6 +11,7 @@
 #include <net/TestTCPServer.h>
 #include <iostream>
 #include "net/TestTcp.h"
+#include "net/UnityPolicyServer.h"
 
 #include "net/game/LoginServer.h"
 
@@ -25,6 +26,7 @@ int main(int argc, char* argv[])
 	    ("help", "produce help message")
 	    ("server", "TCP server (default)")
 	    ("client", "TCP test client")
+	    ("UPS", "Unity Policy Server")
 	    ("port", boost::program_options::value<int>()->default_value(12345), "port of the server (default 12345)")
 	    ("host", boost::program_options::value<std::string>()->default_value("127.0.0.1"), "host of the server (only in client mode)")
 	;
@@ -38,6 +40,14 @@ int main(int argc, char* argv[])
 		std::cout << desc << std::endl;
 		return 1;
 	}
+
+	if (vm.count("UPS"))
+	{
+		UnityPolicyServer ups;
+		ups.run();
+		return 0;
+	}
+
 
 	if (!vm.count("client"))
 	{

@@ -7,18 +7,21 @@ CPP_SRCS += \
 ../src/net/TestTCPClient.cpp \
 ../src/net/TestTCPLoginClient.cpp \
 ../src/net/TestTCPServer.cpp \
+../src/net/UnityPolicyServer.cpp \
 ../src/net/TestTcp.cpp 
 
 OBJS += \
 ./src/net/TestTCPClient.o \
 ./src/net/TestTCPLoginClient.o \
 ./src/net/TestTCPServer.o \
+./src/net/UnityPolicyServer.o \
 ./src/net/TestTcp.o 
 
 CPP_DEPS += \
 ./src/net/TestTCPClient.d \
 ./src/net/TestTCPLoginClient.d \
 ./src/net/TestTCPServer.d \
+./src/net/UnityPolicyServer.d \
 ./src/net/TestTcp.d 
 
 
