@@ -88,7 +88,7 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		case loginServer::Client::INGAME:
 			std::cout << "status : INGAME" << std::endl;
-			getManager().sendMessage(NetworkMessageOut::factory(message));
+			getManager().sendMessage(NetworkMessageOut::factory(message, client->second->getFriend()));
 			break;
 		case loginServer::Client::DISCONNECTED:
 			std::cout << "status : DISCONNECTED" << std::endl;

@@ -26,6 +26,7 @@ public:
 public:
 	static boost::shared_ptr<NetworkMessageOut> factory(unsigned int receiverId, std::string data);
 	static boost::shared_ptr<NetworkMessageOut> factory(boost::shared_ptr<NetworkMessage> messageIn);
+	static boost::shared_ptr<NetworkMessageOut> factory(boost::shared_ptr<NetworkMessage> messageIn, unsigned int receiverId);
 
 private:
 	unsigned int receiver;
