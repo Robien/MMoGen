@@ -34,6 +34,15 @@ void UnityPolicyServer::onMessageReceived(boost::shared_ptr<NetworkMessage> mess
 	std::cout.write(&(*message->getData())[0], message->getDataSize());
 
 	std::cout << std::endl;
+
+	std::string m = "<?xml version=\"1.0\"?>\n";
+	m += "<cross-domain-policy>\n";
+	m += "<allow-access-from domain=\"*\" to-ports=\"4242-4242\"/>\n";
+	m += "</cross-domain-policy>\n";
+	boost::shared_ptr<NetworkMessageOut> messageOut = NetworkMessageOut::factory(message->getSenderId(), m);
+	messageOut->setRaw();
+	manager.sendMessage(messageOut);
+
 }
 
 void UnityPolicyServer::onEvent(NetworkEvent event)

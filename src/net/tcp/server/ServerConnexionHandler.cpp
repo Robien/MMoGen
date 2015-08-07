@@ -103,8 +103,16 @@ void ServerConnexionHandler::handle_readHeader(const boost::system::error_code& 
 		if (size > MAX_SIZE_PACKET)
 		{
 			std::cout << "error : message too large" << std::endl;
+		boost::shared_ptr<boost::array<char, MAX_SIZE_PACKET> > data(new boost::array<char, MAX_SIZE_PACKET>());
+			boost::shared_ptr<NetworkMessage> message(new NetworkMessage(id, 0, data));
+
+			manager->newIncommingMessage(message);
+		//	readHeader();
 		}
-		read(size);
+		else
+		{
+			read(size);
+		}
 	}
 	else
 	{
