@@ -59,6 +59,20 @@ void TestTCPLoginClient::onMessageReceived(boost::shared_ptr<NetworkMessage> mes
 	{
 		std::cout << "INGAME !!!" << std::endl;
 
+		
+	Connection::StartGame sg;
+
+	sg.ParseFromArray(message->getData()->c_array(), message->getDataSize());
+
+	if (sg.ismain())
+	{
+		std::cout << "IS MAIN !" << std::endl;
+	}
+	else
+	{
+		std::cout << "IS NOT MAIN !" << std::endl;
+	}
+
 		timerCaller.callMeIn(this, 1000);
 	}
 	else if (status > 2)
