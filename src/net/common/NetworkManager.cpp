@@ -55,14 +55,18 @@ void NetworkManager::removeIdNS(unsigned int id)
 	if (id + 1 == maxId)
 	{
 		maxId--;
-		for (unsigned int i = anusedId.size() - 1; i >= 0; ++i)
+		for (unsigned int i = anusedId.size() - 1; i > 0 && anusedId.size() != 0; --i)
 		{
+			std::cout << "i=" << i << " anusedId.size()=" << anusedId.size() << std::endl;
 			if (anusedId[i] == maxId)
 			{
 				anusedId[i] = anusedId[anusedId.size() - 1];
 				anusedId.pop_back();
 				maxId--;
-				i = anusedId.size() - 1;
+				if (anusedId.size() != 0)
+				{
+					i = anusedId.size() - 1;
+				}
 			}
 		}
 	}
@@ -84,7 +88,7 @@ void NetworkManager::sendMessage(boost::shared_ptr<NetworkMessageOut> message)
 {
 	if (message.get() == NULL)
 	{
-		std::cout << "ERROR NULL" << std::endl;
+		std::cerr << "ERROR NULL" << std::endl;
 	}
 	idMap[message->getReceiverId()]->add(message);
 }

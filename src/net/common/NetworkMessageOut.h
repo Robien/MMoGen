@@ -17,6 +17,7 @@ class NetworkMessageOut
 {
 public:
 	NetworkMessageOut(unsigned int receiverId, boost::shared_ptr<std::string> data);
+	NetworkMessageOut(bool endConnection);
 	virtual ~NetworkMessageOut();
 
 	boost::shared_ptr<std::string> getData();
@@ -24,6 +25,7 @@ public:
 	unsigned int getReceiverId();
 	void setRaw();
 	bool isRaw();
+	bool isEndConnectionMessage();
 
 public:
 	static boost::shared_ptr<NetworkMessageOut> factory(unsigned int receiverId, std::string data);
@@ -34,6 +36,7 @@ private:
 	unsigned int receiver;
 	boost::shared_ptr<std::string> data;
 	bool raw;
+	bool endConnectionMessage;
 };
 
 #endif /* NETWORKMESSAGEOUT_H_ */
