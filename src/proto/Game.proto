@@ -6,11 +6,16 @@ message MessageType
 	{
 		PING = 1;
 		PONG = 2;
+		MOVE = 3;
+		NEXT_TURN = 4;
+		ATTACK = 5;
 	}
 	required EMessageType type = 1;
 	
 	optional Ping ping = 2;
 	optional Pong pong = 3;
+	optional Move move = 4;
+	optional Attack attack = 5;
 }
 
 message Ping
@@ -21,4 +26,22 @@ message Ping
 message Pong
 {
 	required uint32 id = 1;
+}
+
+message Case
+{
+	required uint32 x = 1;
+	required uint32 y = 2;
+}
+
+message Move
+{
+	required Case from = 1;
+	required Case to = 2;
+}
+
+message Attack
+{
+	required Case from = 1;
+	required Case target = 3;
 }
