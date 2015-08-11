@@ -16,7 +16,7 @@ void NetworkEventManager::addEventReceiver(NetworkEventReceiver* receiver)
 	receivers.push_back(receiver);
 }
 
-void NetworkEventManager::onEvent(NetworkEvent event)
+void NetworkEventManager::onEvent(NetworkEvent& event)
 {
 	for (std::vector<NetworkEventReceiver*>::const_iterator itt = receivers.begin(); itt != receivers.end(); itt++)
 	{

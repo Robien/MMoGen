@@ -24,7 +24,7 @@ public:
 	void addEventReceiver(NetworkEventReceiver* receiver);
 
 public:
-	void onEvent(NetworkEvent event);
+	void onEvent(NetworkEvent& event);
 	void onMessage(boost::shared_ptr<NetworkMessage> message);
 
 private:

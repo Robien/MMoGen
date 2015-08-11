@@ -18,7 +18,7 @@ LoginServer::~LoginServer()
 {
 }
 
-void LoginServer::onEvent(NetworkEvent event)
+void LoginServer::onEvent(NetworkEvent& event)
 {
 	if (event.typeEvent == NetworkEvent::CONNECTION)
 	{

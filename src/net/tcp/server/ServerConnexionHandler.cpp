@@ -47,34 +47,6 @@ void ServerConnexionHandler::run()
 		}
 		socket->send(boost::asio::buffer(*message->getData()));
 
-//	readHeader();
-//	std::string msg = "hello ...";
-//
-//	unsigned int value = msg.size();
-//	std::string msgSize;
-//	msgSize.clear();
-//	msgSize.push_back((value >> 24) & 0xFF);
-//	msgSize.push_back((value >> 16) & 0xFF);
-//	msgSize.push_back((value >> 8) & 0xFF);
-//	msgSize.push_back((value) & 0xFF);
-//
-//	socket->send(boost::asio::buffer(msgSize));
-//	socket->send(boost::asio::buffer(msg));
-//
-//	sleep(3);
-//
-//	std::string msg2 = "world !";
-//	value = msg2.size();
-//	msgSize.clear();
-//	msgSize.push_back((value >> 24) & 0xFF);
-//	msgSize.push_back((value >> 16) & 0xFF);
-//	msgSize.push_back((value >> 8) & 0xFF);
-//	msgSize.push_back((value) & 0xFF);
-//
-//	socket->send(boost::asio::buffer(msgSize));
-//	socket->send(boost::asio::buffer(msg2));
-////	socket->close();
-////	delete socket;
 	}
 }
 
@@ -116,7 +88,7 @@ void ServerConnexionHandler::handle_readHeader(const boost::system::error_code& 
 	}
 	else
 	{
-		std::cout << error.message() << std::endl;
+		std::cerr << "Error read Header : " << error.message() << std::endl;
 	}
 }
 void ServerConnexionHandler::handle_read(const boost::system::error_code& error, size_t number_bytes_read)
@@ -129,14 +101,11 @@ void ServerConnexionHandler::handle_read(const boost::system::error_code& error,
 
 		manager->newIncommingMessage(message);
 
-//		std::cout << "Server : ";
-//		std::cout.write(&network_buffer[0], number_bytes_read);
-//		std::cout << std::endl;
 		readHeader();
 	}
 	else
 	{
-		std::cout << error.message();
+		std::cerr << "Error read : " << error.message() << std::endl;
 	}
 }
 

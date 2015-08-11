@@ -22,7 +22,7 @@ public:
 	virtual ~LoginServer();
 
 public:
-	void onEvent(NetworkEvent event);
+	void onEvent(NetworkEvent& event);
 	void onMessageReceived(boost::shared_ptr<NetworkMessage> message);
 
 private:
