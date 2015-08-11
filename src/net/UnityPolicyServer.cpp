@@ -45,7 +45,7 @@ void UnityPolicyServer::onMessageReceived(boost::shared_ptr<NetworkMessage> mess
 
 }
 
-void UnityPolicyServer::onEvent(NetworkEvent event)
+void UnityPolicyServer::onEvent(NetworkEvent& event)
 {
 
 	std::string message = "<?xml version=\"1.0\"?>\n";

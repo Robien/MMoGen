@@ -19,7 +19,7 @@ public:
 	virtual ~NetworkEventReceiver();
 
 public:
-	virtual void onEvent(NetworkEvent event) = 0;
+	virtual void onEvent(NetworkEvent& event) = 0;
 	virtual void onMessageReceived(boost::shared_ptr<NetworkMessage> message) = 0;
 };
 

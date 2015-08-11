@@ -16,7 +16,7 @@ namespace loginServer
 	public:
 		enum status
 		{
-			CONNECTED, IN_MM, WAITING_FOR_READY, READY, INGAME, DISCONNECTED
+			CONNECTED, IN_MM, WAITING_FOR_READY, READY, INGAME, ALONE, DISCONNECTED
 		};
 
 	public:
@@ -36,6 +36,7 @@ namespace loginServer
 		void setIsReady();
 		void setInGame();
 		void setFriend(unsigned int id);
+		void setIsAlone();
 		unsigned int getFriend();
 
 	private:

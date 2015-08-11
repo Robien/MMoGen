@@ -41,6 +41,11 @@ namespace loginServer
 			clientStatus = Client::DISCONNECTED;
 		}
 	}
+	void Client::setIsAlone()
+	{
+		clientStatus = Client::ALONE;
+		this->setFriend(0);
+	}
 	void Client::setStartMM()
 	{
 		clientStatus = Client::IN_MM;

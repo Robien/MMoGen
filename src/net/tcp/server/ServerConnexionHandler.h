@@ -34,6 +34,9 @@ public:
 	void run();
 
 private:
+	void endConnection();
+
+private:
 	boost::asio::ip::tcp::socket* socket;
 	NetworkManager* manager;
 	unsigned int id;

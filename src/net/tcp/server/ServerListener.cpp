@@ -24,13 +24,20 @@ ServerListener::~ServerListener()
 
 void ServerListener::handler(const boost::system::error_code& error)
 {
-	serverClientManager.newClient(socket);
-	listen();
+
+	if (!error)
+	{
+		serverClientManager.newClient(socket);
+		listen();
+	}
+	else
+	{
+		std::cerr << "Error server accept : " << error.message() << std::endl;
+	}
 }
 
 void ServerListener::listen()
 {
 	socket = new boost::asio::ip::tcp::socket(io_service);
 	acceptor.async_accept(*socket, boost::bind(&ServerListener::handler, this, boost::asio::placeholders::error));
-
 }

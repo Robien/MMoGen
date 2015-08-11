@@ -7,8 +7,14 @@
 
 #include <net/common/NetworkMessageOut.h>
 
+NetworkMessageOut::NetworkMessageOut(bool endConnection) :
+		receiver(0), raw(false), endConnectionMessage(true)
+{
+
+}
+
 NetworkMessageOut::NetworkMessageOut(unsigned int receiverId, boost::shared_ptr<std::string> data) :
-		receiver(receiverId), data(data), raw(false)
+		receiver(receiverId), data(data), raw(false), endConnectionMessage(false)
 {
 }
 
@@ -54,5 +60,9 @@ void NetworkMessageOut::setRaw()
 bool NetworkMessageOut::isRaw()
 {
 	return raw;
+}
+bool NetworkMessageOut::isEndConnectionMessage()
+{
+	return endConnectionMessage;
 }
 

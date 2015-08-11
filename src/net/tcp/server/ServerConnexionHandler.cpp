@@ -9,6 +9,8 @@
 #include <iostream>
 
 #include <boost/bind.hpp>
+#include <net/common/NetworkEvent.h>
+#include <net/common/NetworkEventManager.h>
 
 ServerConnexionHandler::ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager) :
 		socket(socket), manager(manager), id(manager->getNewId()), messagesToSend(new SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> >())
@@ -28,54 +30,36 @@ void ServerConnexionHandler::handler()
 }
 void ServerConnexionHandler::run()
 {
-	for (;;)
+	bool running = true;
+	while (running)
 	{
 
 		boost::shared_ptr<NetworkMessageOut> message = messagesToSend->get();
-
-
-		if (!message->isRaw())
+		if (message->isEndConnectionMessage())
 		{
-			unsigned int value = message->getData()->size();
-			std::string msgSize;
-			msgSize.push_back((value >> 24) & 0xFF);
-			msgSize.push_back((value >> 16) & 0xFF);
-			msgSize.push_back((value >> 8) & 0xFF);
-			msgSize.push_back((value) & 0xFF);
-
-			socket->send(boost::asio::buffer(msgSize));
+			running = false;
 		}
-		socket->send(boost::asio::buffer(*message->getData()));
+		else
+		{
+			if (!message->isRaw())
+			{
+				unsigned int value = message->getData()->size();
+				std::string msgSize;
+				msgSize.push_back((value >> 24) & 0xFF);
+				msgSize.push_back((value >> 16) & 0xFF);
+				msgSize.push_back((value >> 8) & 0xFF);
+				msgSize.push_back((value) & 0xFF);
 
-//	readHeader();
-//	std::string msg = "hello ...";
-//
-//	unsigned int value = msg.size();
-//	std::string msgSize;
-//	msgSize.clear();
-//	msgSize.push_back((value >> 24) & 0xFF);
-//	msgSize.push_back((value >> 16) & 0xFF);
-//	msgSize.push_back((value >> 8) & 0xFF);
-//	msgSize.push_back((value) & 0xFF);
-//
-//	socket->send(boost::asio::buffer(msgSize));
-//	socket->send(boost::asio::buffer(msg));
-//
-//	sleep(3);
-//
-//	std::string msg2 = "world !";
-//	value = msg2.size();
-//	msgSize.clear();
-//	msgSize.push_back((value >> 24) & 0xFF);
-//	msgSize.push_back((value >> 16) & 0xFF);
-//	msgSize.push_back((value >> 8) & 0xFF);
-//	msgSize.push_back((value) & 0xFF);
-//
-//	socket->send(boost::asio::buffer(msgSize));
-//	socket->send(boost::asio::buffer(msg2));
-////	socket->close();
-////	delete socket;
+				socket->send(boost::asio::buffer(msgSize));
+			}
+			socket->send(boost::asio::buffer(*message->getData()));
+		}
 	}
+	manager->removeId(id);
+	NetworkEvent event(NetworkEvent::DISCONECTION);
+	event.id = id;
+	NetworkEventManager::get()->onEvent(event);
+	std::cout << "id " << id << " has been disconnected" << std::endl;
 }
 
 void ServerConnexionHandler::readHeader()
@@ -103,11 +87,12 @@ void ServerConnexionHandler::handle_readHeader(const boost::system::error_code& 
 		if (size > MAX_SIZE_PACKET)
 		{
 			std::cout << "error : message too large" << std::endl;
-		boost::shared_ptr<boost::array<char, MAX_SIZE_PACKET> > data(new boost::array<char, MAX_SIZE_PACKET>());
+			boost::shared_ptr<boost::array<char, MAX_SIZE_PACKET> > data(new boost::array<char, MAX_SIZE_PACKET>());
 			boost::shared_ptr<NetworkMessage> message(new NetworkMessage(id, 0, data));
 
 			manager->newIncommingMessage(message);
-		//	readHeader();
+			endConnection();
+			//	readHeader();
 		}
 		else
 		{
@@ -116,7 +101,8 @@ void ServerConnexionHandler::handle_readHeader(const boost::system::error_code& 
 	}
 	else
 	{
-		std::cout << error.message() << std::endl;
+		std::cerr << "Error read Header : " << error.message() << std::endl;
+		endConnection();
 	}
 }
 void ServerConnexionHandler::handle_read(const boost::system::error_code& error, size_t number_bytes_read)
@@ -129,14 +115,17 @@ void ServerConnexionHandler::handle_read(const boost::system::error_code& error,
 
 		manager->newIncommingMessage(message);
 
-//		std::cout << "Server : ";
-//		std::cout.write(&network_buffer[0], number_bytes_read);
-//		std::cout << std::endl;
 		readHeader();
 	}
 	else
 	{
-		std::cout << error.message();
+		std::cerr << "Error read : " << error.message() << std::endl;
+		endConnection();
 	}
+}
+void ServerConnexionHandler::endConnection()
+{
+	boost::shared_ptr<NetworkMessageOut> message(new NetworkMessageOut(true));
+	messagesToSend->add(message);
 }
 

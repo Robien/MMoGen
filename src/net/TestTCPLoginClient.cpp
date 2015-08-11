@@ -83,7 +83,7 @@ void TestTCPLoginClient::onMessageReceived(boost::shared_ptr<NetworkMessage> mes
 
 }
 
-void TestTCPLoginClient::onEvent(NetworkEvent event)
+void TestTCPLoginClient::onEvent(NetworkEvent& event)
 {
 	switch (event.typeEvent)
 	{

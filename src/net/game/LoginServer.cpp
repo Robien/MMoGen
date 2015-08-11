@@ -9,16 +9,18 @@
 
 #include "proto/src/Connection.pb.h"
 
-LoginServer::LoginServer(unsigned int port) : TCPServer(port)
+LoginServer::LoginServer(unsigned int port) :
+		TCPServer(port)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
+	waiting.reset();
 }
 
 LoginServer::~LoginServer()
 {
 }
 
-void LoginServer::onEvent(NetworkEvent event)
+void LoginServer::onEvent(NetworkEvent& event)
 {
 	if (event.typeEvent == NetworkEvent::CONNECTION)
 	{
@@ -39,7 +41,7 @@ void LoginServer::onEvent(NetworkEvent event)
 	{
 		//TODO unlink with potential friends
 		std::cout << "[EVENT] disconnection id : " << event.id << std::endl;
-		if (waiting->getId() == event.id)
+		if (waiting.get() != NULL && waiting->getId() == event.id)
 		{
 			waiting.reset();
 		}
@@ -48,12 +50,25 @@ void LoginServer::onEvent(NetworkEvent event)
 
 		if (client == clients.end())
 		{
-			std::cout << " ... [E] client with id " << event.id << " is not known" << std::endl;
+			std::cerr << " ... [E] client with id " << event.id << " is not known" << std::endl;
 		}
 		else
 		{
 			clients.erase(client);
+
+			client = clients.find(client->second->getFriend());
+
+			if (client != clients.end())
+			{
+				client->second->setIsAlone();
+			}
+			else
+			{
+				std::cout << "client with id " << event.id << " has no friend ! " << std::endl;
+			}
 		}
+
+		std::cout << "[EVENT] disconnection done id : " << event.id << std::endl;
 
 	}
 }
@@ -92,6 +107,9 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		case loginServer::Client::DISCONNECTED:
 			std::cout << "status : DISCONNECTED" << std::endl;
+			break;
+		case loginServer::Client::ALONE:
+			std::cout << "status : ALONE : message ignored" << std::endl;
 			break;
 		default:
 			break;
