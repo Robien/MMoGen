@@ -5,12 +5,15 @@
  *      Author: rguyard
  */
 
+#include <boost/asio.hpp>
 #include "ServerConnexionHandler.h"
 #include <iostream>
 
 #include <boost/bind.hpp>
 #include <net/common/NetworkEvent.h>
 #include <net/common/NetworkEventManager.h>
+
+using boost::asio::socket_base;
 
 ServerConnexionHandler::ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager) :
 		socket(socket), manager(manager), id(manager->getNewId()), messagesToSend(new SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> >())
@@ -31,34 +34,54 @@ void ServerConnexionHandler::handler()
 void ServerConnexionHandler::run()
 {
 	bool running = true;
-	while (running)
+	try
 	{
-
-		boost::shared_ptr<NetworkMessageOut> message = messagesToSend->get();
-		if (message->isEndConnectionMessage())
+		while (running)
 		{
-			running = false;
-		}
-		else
-		{
-			if (!message->isRaw())
+			boost::shared_ptr<NetworkMessageOut> message = messagesToSend->get();
+			if (message->isEndConnectionMessage())
 			{
-				unsigned int value = message->getData()->size();
-				std::string msgSize;
-				msgSize.push_back((value >> 24) & 0xFF);
-				msgSize.push_back((value >> 16) & 0xFF);
-				msgSize.push_back((value >> 8) & 0xFF);
-				msgSize.push_back((value) & 0xFF);
-
-				socket->send(boost::asio::buffer(msgSize));
+				running = false;
 			}
-			socket->send(boost::asio::buffer(*message->getData()));
+			else
+			{
+				if (!message->isRaw())
+				{
+					unsigned int value = message->getData()->size();
+					std::string msgSize;
+					msgSize.push_back((value >> 24) & 0xFF);
+					msgSize.push_back((value >> 16) & 0xFF);
+					msgSize.push_back((value >> 8) & 0xFF);
+					msgSize.push_back((value) & 0xFF);
+
+					socket->send(boost::asio::buffer(msgSize));
+				}
+				socket->send(boost::asio::buffer(*message->getData()));
+			}
 		}
+	} catch (boost::system::system_error& e)
+	{
+		std::cerr << "error with the TCP connection : " << e.what() << std::endl;
 	}
 	manager->removeId(id);
 	NetworkEvent event(NetworkEvent::DISCONECTION);
 	event.id = id;
 	NetworkEventManager::get()->onEvent(event);
+	try
+	{
+		socket->shutdown(socket_base::shutdown_both);
+	} catch (boost::system::system_error& e)
+	{
+
+	}
+	try
+	{
+		socket->close();
+	} catch (boost::system::system_error& e)
+	{
+
+	}
+	manager->removeBuffer(id);
 	std::cout << "id " << id << " has been disconnected" << std::endl;
 }
 

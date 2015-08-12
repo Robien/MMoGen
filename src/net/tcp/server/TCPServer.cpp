@@ -8,7 +8,8 @@
 #include "net/tcp/server/TCPServer.h"
 #include "net/common/NetworkEventManager.h"
 
-TCPServer::TCPServer(unsigned int port) : port(port)
+TCPServer::TCPServer(unsigned int port) :
+		port(port)
 {
 	NetworkEventManager::get()->addEventReceiver(this);
 	server = NULL;
@@ -20,12 +21,34 @@ TCPServer::~TCPServer()
 
 void TCPServer::listen()
 {
-		boost::asio::io_service io;
-		server = new ServerListener(io, port, &manager);
+	for (;;)
+	{
+		try
+		{
+			boost::asio::io_service io;
+			for (;;)
+			{
+				try
+				{
+					server = new ServerListener(io, port, &manager);
 
-		server->listen();
+					server->listen();
 
-		io.run();
+					io.run();
+				}
+				catch (boost::system::system_error& e)
+				{
+					std::cerr << "io.run error : " << e.what() << std::endl;
+				}
+				io.reset();
+				exit(0); //TEMP kill the server to be sure to not being blocked in a infinite loop
+			}
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "Error listen : " << e.what() << std::endl;
+		}
+	}
 }
 
 ServerListener* TCPServer::getServerEndpoint()

@@ -27,7 +27,6 @@ TestTCPLoginClient::~TestTCPLoginClient()
 
 void TestTCPLoginClient::run()
 {
-	boost::asio::io_service io;
 	boost::asio::ip::tcp::resolver resolver(io);
 	boost::asio::ip::tcp::resolver::query query(host, "");
 	boost::asio::ip::tcp::resolver::iterator i = resolver.resolve(query);
@@ -164,6 +163,11 @@ void TestTCPLoginClient::computeInGameMessage(boost::shared_ptr<NetworkMessage> 
 	{
 		std::cout << "ping : " << timerPing.getValueinMilliSecond() << "ms" << std::endl;
 		timerCaller.callMeIn(this, 1000);
+	}
+	else if (messageType.type() == Game::MessageType::REMOTE_DISCONNECTION)
+	{
+		std::cout << "the other player has been disconnected !" << std::endl;
+		io.stop();
 	}
 	else
 	{

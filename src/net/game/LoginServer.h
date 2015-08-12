@@ -10,6 +10,7 @@
 
 #include <boost/asio.hpp>
 #include <net/game/Client.h>
+#include <thread/MutexAuto.h>
 #include "net/common/NetworkEventReceiver.h"
 #include "net/common/NetworkManager.h"
 
@@ -32,6 +33,7 @@ private:
 			std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client);
 	void sendMFMessage(unsigned int id);
 	void sendStartGame(unsigned int id, bool isMain);
+	void sendInGameRemoteDisconnection(unsigned int id);
 
 private:
 
@@ -41,6 +43,9 @@ private:
 private:
 	boost::shared_ptr<loginServer::Client> waiting;
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> > clients;
+
+private:
+	MutexAuto mutexInterClient;
 };
 
 #endif /* LOGINSERVER_H_ */

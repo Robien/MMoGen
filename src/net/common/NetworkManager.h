@@ -28,6 +28,7 @@ public:
 
 public:
 	void reportNewBuffer(unsigned int id, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > buff);
+	void removeBuffer(unsigned int id);
 	void sendMessage(boost::shared_ptr<NetworkMessageOut> message);
 
 public:

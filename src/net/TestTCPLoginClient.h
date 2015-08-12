@@ -48,6 +48,7 @@ private:
 	TimerCaller timerCaller;
 
 private:
+	boost::asio::io_service io;
 	std::string host;
 	unsigned int port;
 };

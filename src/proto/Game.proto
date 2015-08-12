@@ -6,9 +6,10 @@ message MessageType
 	{
 		PING = 1;
 		PONG = 2;
-		MOVE = 3;
-		NEXT_TURN = 4;
-		ATTACK = 5;
+		REMOTE_DISCONNECTION = 3;
+		MOVE = 4;
+		NEXT_TURN = 5;
+		ATTACK = 6;
 	}
 	required EMessageType type = 1;
 	

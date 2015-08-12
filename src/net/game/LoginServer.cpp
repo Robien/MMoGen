@@ -5,6 +5,7 @@
  *      Author: rguyard
  */
 
+#include <proto/src/Game.pb.h>
 #include "net/game/LoginServer.h"
 
 #include "proto/src/Connection.pb.h"
@@ -25,7 +26,7 @@ void LoginServer::onEvent(NetworkEvent& event)
 	if (event.typeEvent == NetworkEvent::CONNECTION)
 	{
 		std::cout << "[EVENT] connection id : " << event.id << std::endl;
-
+		mutexInterClient.lock();
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::iterator client = clients.find(event.id);
 
 		if (client != clients.end())
@@ -33,13 +34,16 @@ void LoginServer::onEvent(NetworkEvent& event)
 			std::cout << " ... [E] client with id " << event.id << " is already known" << std::endl;
 			clients.erase(client);
 		}
+		mutexInterClient.unlock();
 		boost::shared_ptr<loginServer::Client> clientPtr(new loginServer::Client(event.id));
 		clientPtr->setIsConnected(true);
+		mutexInterClient.lock();
 		clients.insert(std::pair<unsigned int, boost::shared_ptr<loginServer::Client> >(event.id, clientPtr));
+		mutexInterClient.unlock();
 	}
 	else
 	{
-		//TODO unlink with potential friends
+		mutexInterClient.lock();
 		std::cout << "[EVENT] disconnection id : " << event.id << std::endl;
 		if (waiting.get() != NULL && waiting->getId() == event.id)
 		{
@@ -60,6 +64,7 @@ void LoginServer::onEvent(NetworkEvent& event)
 
 			if (client != clients.end())
 			{
+				sendInGameRemoteDisconnection(client->second->getId());
 				client->second->setIsAlone();
 			}
 			else
@@ -67,6 +72,7 @@ void LoginServer::onEvent(NetworkEvent& event)
 				std::cout << "client with id " << event.id << " has no friend ! " << std::endl;
 			}
 		}
+		mutexInterClient.unlock();
 
 		std::cout << "[EVENT] disconnection done id : " << event.id << std::endl;
 
@@ -75,7 +81,9 @@ void LoginServer::onEvent(NetworkEvent& event)
 void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
 	std::cout << "received a message from id " << message->getSenderId() << std::endl;
+	mutexInterClient.lock();
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client = clients.find(message->getSenderId());
+	mutexInterClient.unlock();
 
 	if (client == clients.end())
 	{
@@ -103,6 +111,7 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		case loginServer::Client::INGAME:
 			std::cout << "status : INGAME" << std::endl;
+			//TODO : avoid copy
 			getManager().sendMessage(NetworkMessageOut::factory(message, client->second->getFriend()));
 			break;
 		case loginServer::Client::DISCONNECTED:
@@ -165,7 +174,7 @@ void LoginServer::computeREADYMessage(boost::shared_ptr<NetworkMessage> message,
 		std::cerr << "Failed to parse READY message." << std::endl;
 	}
 	client->second->setIsReady();
-
+	mutexInterClient.lock();
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator other = clients.find(client->second->getFriend());
 
 	if (other == clients.end())
@@ -179,7 +188,7 @@ void LoginServer::computeREADYMessage(boost::shared_ptr<NetworkMessage> message,
 		client->second->setInGame();
 		startGame(other, client);
 	}
-
+	mutexInterClient.unlock();
 }
 
 void LoginServer::sendMFMessage(unsigned int id)
@@ -206,4 +215,13 @@ void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer
 	sendStartGame(player1->second->getId(), true);
 	sendStartGame(player2->second->getId(), false);
 	std::cout << "starting game with id : " << player1->second->getId() << " and id : " << player2->second->getId() << std::endl;
+}
+
+void LoginServer::sendInGameRemoteDisconnection(unsigned int id)
+{
+	Game::MessageType mt;
+
+	mt.set_type(Game::MessageType_EMessageType_REMOTE_DISCONNECTION);
+
+	getManager().sendMessage(NetworkMessageOut::factory(id, mt.SerializeAsString()));
 }

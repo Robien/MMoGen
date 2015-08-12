@@ -78,17 +78,35 @@ void NetworkManager::removeIdNS(unsigned int id)
 
 void NetworkManager::reportNewBuffer(unsigned int id, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > buff)
 {
+	mutexId.lock();
 	idMap[id] = buff;
+	mutexId.unlock();
 	NetworkEvent event(NetworkEvent::CONNECTION);
 	event.id = id;
 	NetworkEventManager::get()->onEvent(event);
 }
-
+void NetworkManager::removeBuffer(unsigned int id)
+{
+	mutexId.lock();
+	idMap.erase(id);
+	mutexId.unlock();
+}
 void NetworkManager::sendMessage(boost::shared_ptr<NetworkMessageOut> message)
 {
+	mutexId.lock();
 	if (message.get() == NULL)
 	{
 		std::cerr << "ERROR NULL" << std::endl;
 	}
-	idMap[message->getReceiverId()]->add(message);
+	std::map<unsigned int, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > >::const_iterator buf = idMap.find(
+			message->getReceiverId());
+	mutexId.unlock();
+	if (buf != idMap.end())
+	{
+		buf->second->add(message);
+	}
+	else
+	{
+		std::cerr << "message can't be send : remote client disconnected" << std::endl;
+	}
 }
