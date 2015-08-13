@@ -18,8 +18,8 @@ ServerClientManager::~ServerClientManager()
 {
 }
 
-void ServerClientManager::newClient(boost::asio::ip::tcp::socket* socket)
+void ServerClientManager::newClient(boost::asio::ip::tcp::socket* socket, bool raw)
 {
-	new ServerConnexionHandler(socket, manager);
+	new ServerConnexionHandler(socket, manager, raw);
 }
 

@@ -12,7 +12,7 @@
 
 TestTCPServer::TestTCPServer()
 {
-	NetworkEventManager::get()->addEventReceiver(this);
+	manager.getNetworkEventManager()->addEventReceiver(this);
 }
 
 TestTCPServer::~TestTCPServer()

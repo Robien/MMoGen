@@ -10,6 +10,7 @@
 
 #include <boost/asio.hpp>
 #include <data/SynchonizedBuffer.h>
+#include <net/common/NetworkEventManager.h>
 #include <net/common/NetworkMessageOut.h>
 #include <thread/MutexAuto.h>
 #include <vector>
@@ -17,10 +18,14 @@
 #include "NetworkMessage.h"
 #include <map>
 
+#include "SimpleJSON/src/JSON.h"
+
+class WebServer;
+
 class NetworkManager
 {
 public:
-	NetworkManager(bool isServer = true);
+	NetworkManager(WebServer* webserver = NULL);
 	virtual ~NetworkManager();
 
 public:
@@ -32,20 +37,32 @@ public:
 	void sendMessage(boost::shared_ptr<NetworkMessageOut> message);
 
 public:
+	NetworkEventManager* getNetworkEventManager();
+
+public:
 	int getNewId();
 	void removeId(unsigned int id);
 
-private:
-	void removeIdNS(unsigned int id);
+public:
+	std::string getJSONData();
 
 private:
-	bool isServer;
+	void removeIdNS(unsigned int id);
+	void removeIdNSV2(unsigned int id);
+
+private:
+	WebServer* webserver;
+private:
+	unsigned int nbConnected;
 	//IDs
 	MutexAuto mutexId;
 	unsigned int maxId;
 	std::vector<unsigned int> anusedId;
 
 	std::map<unsigned int, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > > idMap;
+
+private:
+	NetworkEventManager networkEventManager;
 
 };
 

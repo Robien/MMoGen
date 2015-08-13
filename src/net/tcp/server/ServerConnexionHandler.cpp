@@ -15,8 +15,9 @@
 
 using boost::asio::socket_base;
 
-ServerConnexionHandler::ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager) :
-		socket(socket), manager(manager), id(manager->getNewId()), messagesToSend(new SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> >())
+ServerConnexionHandler::ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager, bool raw) :
+		socket(socket), manager(manager), id(manager->getNewId()), messagesToSend(new SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> >()), raw(
+				raw)
 {
 	readHeader();
 	handler();
@@ -66,7 +67,7 @@ void ServerConnexionHandler::run()
 	manager->removeId(id);
 	NetworkEvent event(NetworkEvent::DISCONECTION);
 	event.id = id;
-	NetworkEventManager::get()->onEvent(event);
+	manager->getNetworkEventManager()->onEvent(event);
 	try
 	{
 		socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
@@ -87,10 +88,24 @@ void ServerConnexionHandler::run()
 
 void ServerConnexionHandler::readHeader()
 {
-	boost::asio::async_read(*socket, boost::asio::buffer(network_buffer_header), boost::asio::transfer_exactly(4),
-			boost::bind(&ServerConnexionHandler::handle_readHeader, this, boost::asio::placeholders::error,
-					boost::asio::placeholders::bytes_transferred));
+	if (raw)
+	{
+		readAll();
+	}
+	else
+	{
+		boost::asio::async_read(*socket, boost::asio::buffer(network_buffer_header), boost::asio::transfer_exactly(4),
+				boost::bind(&ServerConnexionHandler::handle_readHeader, this, boost::asio::placeholders::error,
+						boost::asio::placeholders::bytes_transferred));
+	}
 }
+
+void ServerConnexionHandler::readAll()
+{
+	boost::asio::async_read(*socket, boost::asio::buffer(network_buffer), boost::asio::transfer_at_least(1),
+			boost::bind(&ServerConnexionHandler::handle_read, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+}
+
 void ServerConnexionHandler::read(unsigned int size)
 {
 	boost::asio::async_read(*socket, boost::asio::buffer(network_buffer), boost::asio::transfer_exactly(size),

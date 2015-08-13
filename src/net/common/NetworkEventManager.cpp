@@ -7,6 +7,12 @@
 
 #include <net/common/NetworkEventManager.h>
 
+
+NetworkEventManager::NetworkEventManager()
+{
+
+}
+
 NetworkEventManager::~NetworkEventManager()
 {
 }

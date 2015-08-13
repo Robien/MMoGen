@@ -5,13 +5,14 @@
  *      Author: rguyard
  */
 
+#include <net/web/WebServer.h>
 #include "net/tcp/server/TCPServer.h"
 #include "net/common/NetworkEventManager.h"
 
-TCPServer::TCPServer(unsigned int port) :
-		port(port)
+TCPServer::TCPServer(unsigned int port, bool withWebServer) :
+	manager(withWebServer ? new WebServer(&manager) : NULL), port(port)
 {
-	NetworkEventManager::get()->addEventReceiver(this);
+	manager.getNetworkEventManager()->addEventReceiver(this);
 	server = NULL;
 }
 

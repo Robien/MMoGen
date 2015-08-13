@@ -18,7 +18,7 @@ public:
 	virtual ~ServerClientManager();
 
 public:
-	void newClient(boost::asio::ip::tcp::socket* socket);
+	void newClient(boost::asio::ip::tcp::socket* socket, bool raw);
 
 private:
 	NetworkManager* manager;

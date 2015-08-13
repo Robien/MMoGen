@@ -15,7 +15,7 @@
 
 TestTcp::TestTcp()
 {
-	NetworkEventManager::get()->addEventReceiver(this);
+	manager.getNetworkEventManager()->addEventReceiver(this);
 }
 
 TestTcp::~TestTcp()

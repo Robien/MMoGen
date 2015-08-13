@@ -17,7 +17,7 @@
 class TCPServer : public NetworkEventReceiver
 {
 public:
-	TCPServer(unsigned int port);
+	TCPServer(unsigned int port, bool withWebServer);
 	virtual ~TCPServer();
 
 	public:

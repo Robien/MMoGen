@@ -19,7 +19,7 @@
 class ServerListener
 {
 public:
-	ServerListener(boost::asio::io_service& io_service, unsigned int port, NetworkManager* manager);
+	ServerListener(boost::asio::io_service& io_service, unsigned int port, NetworkManager* manager, bool raw = false);
 	virtual ~ServerListener();
 
 public:
@@ -33,6 +33,7 @@ private:
 	boost::asio::ip::tcp::socket* socket;
 	NetworkManager* manager;
 	ServerClientManager serverClientManager;
+	bool raw;
 
 };
 

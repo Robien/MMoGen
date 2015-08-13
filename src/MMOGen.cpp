@@ -16,6 +16,7 @@
 #include "net/game/LoginServer.h"
 
 #include <boost/program_options.hpp>
+#include <net/web/WebServer.h>
 
 int main(int argc, char* argv[])
 {
@@ -27,6 +28,7 @@ int main(int argc, char* argv[])
 	    ("server", "TCP server (default)")
 	    ("client", "TCP test client")
 	    ("UPS", "Unity Policy Server")
+	    ("web", "web Server")
 	    ("port", boost::program_options::value<int>()->default_value(12345), "port of the server (default 12345)")
 	    ("host", boost::program_options::value<std::string>()->default_value("127.0.0.1"), "host of the server (only in client mode)")
 	;
@@ -47,7 +49,12 @@ int main(int argc, char* argv[])
 		ups.run();
 		return 0;
 	}
-
+	if (vm.count("web"))
+	{
+		WebServer ws(NULL);
+		ws.run();
+		return 0;
+	}
 
 	if (!vm.count("client"))
 	{

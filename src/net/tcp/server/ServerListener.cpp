@@ -12,9 +12,9 @@
 
 #include "ServerConnexionHandler.h"
 
-ServerListener::ServerListener(boost::asio::io_service& io_service, unsigned int port, NetworkManager* manager) :
+ServerListener::ServerListener(boost::asio::io_service& io_service, unsigned int port, NetworkManager* manager, bool raw) :
 		acceptor(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)), io_service(io_service), socket(NULL), manager(
-				manager), serverClientManager(manager)
+				manager), serverClientManager(manager), raw(raw)
 {
 }
 
@@ -27,7 +27,7 @@ void ServerListener::handler(const boost::system::error_code& error)
 
 	if (!error)
 	{
-		serverClientManager.newClient(socket);
+		serverClientManager.newClient(socket, raw);
 		listen();
 	}
 	else

@@ -17,7 +17,7 @@ class NetworkMessageOut
 {
 public:
 	NetworkMessageOut(unsigned int receiverId, boost::shared_ptr<std::string> data);
-	NetworkMessageOut(bool endConnection);
+	NetworkMessageOut(bool endConnection, unsigned int receiver = 0);
 	virtual ~NetworkMessageOut();
 
 	boost::shared_ptr<std::string> getData();

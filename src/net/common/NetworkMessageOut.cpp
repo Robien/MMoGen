@@ -7,8 +7,8 @@
 
 #include <net/common/NetworkMessageOut.h>
 
-NetworkMessageOut::NetworkMessageOut(bool endConnection) :
-		receiver(0), raw(false), endConnectionMessage(true)
+NetworkMessageOut::NetworkMessageOut(bool endConnection, unsigned int receiver) :
+		receiver(receiver), raw(false), endConnectionMessage(true)
 {
 
 }

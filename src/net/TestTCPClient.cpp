@@ -12,7 +12,7 @@
 
 TestTCPClient::TestTCPClient()
 {
-	NetworkEventManager::get()->addEventReceiver(this);
+	manager.getNetworkEventManager()->addEventReceiver(this);
 }
 
 TestTCPClient::~TestTCPClient()

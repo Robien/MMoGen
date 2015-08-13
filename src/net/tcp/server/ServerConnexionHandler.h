@@ -20,11 +20,12 @@
 class ServerConnexionHandler: public Thread
 {
 public:
-	ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager);
+	ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager, bool raw);
 	virtual ~ServerConnexionHandler();
 
 	void readHeader();
 	void read(unsigned int size);
+	void readAll();
 	void handle_readHeader(const boost::system::error_code& error, size_t number_bytes_read);
 	void handle_read(const boost::system::error_code& error, size_t number_bytes_read);
 
@@ -43,6 +44,7 @@ private:
 	boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > messagesToSend;
 	boost::array<char, MAX_SIZE_PACKET> network_buffer;
 	boost::array<char, 4> network_buffer_header;
+	bool raw;
 };
 
 #endif /* SERVERCONNEXIONHANDLER_H_ */

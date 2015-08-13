@@ -8,11 +8,13 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include third/SimpleJSON/src/subdir.mk
 -include src/tools/time/subdir.mk
 -include src/tools/thread/subdir.mk
 -include src/tools/data/subdir.mk
 -include src/tools/subdir.mk
 -include src/proto/src/subdir.mk
+-include src/net/web/subdir.mk
 -include src/net/tcp/server/subdir.mk
 -include src/net/tcp/client/subdir.mk
 -include src/net/game/subdir.mk

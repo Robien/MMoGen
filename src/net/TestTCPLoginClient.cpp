@@ -16,7 +16,7 @@
 TestTCPLoginClient::TestTCPLoginClient(std::string host, unsigned int port) : host(host), port(port)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
-	NetworkEventManager::get()->addEventReceiver(this);
+	manager.getNetworkEventManager()->addEventReceiver(this);
 	status = 0;
 	pingId = 0;
 }

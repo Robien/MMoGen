@@ -11,7 +11,7 @@
 #include "proto/src/Connection.pb.h"
 
 LoginServer::LoginServer(unsigned int port) :
-		TCPServer(port)
+		TCPServer(port, true)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	waiting.reset();

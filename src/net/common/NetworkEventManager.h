@@ -13,11 +13,10 @@
 #include <shared_ptr.h>
 #include <vector>
 
-#include "Singleton.h"
-
-class NetworkEventManager: public Singleton<NetworkEventManager>
+class NetworkEventManager
 {
 public:
+	NetworkEventManager();
 	virtual ~NetworkEventManager();
 
 public:
