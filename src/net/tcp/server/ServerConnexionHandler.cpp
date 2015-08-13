@@ -69,17 +69,17 @@ void ServerConnexionHandler::run()
 	NetworkEventManager::get()->onEvent(event);
 	try
 	{
-		socket->shutdown(socket_base::shutdown_both);
+		socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 	} catch (boost::system::system_error& e)
 	{
-
+		std::cerr << "error socket shutdown : " << e.what() << std::endl;
 	}
 	try
 	{
 		socket->close();
 	} catch (boost::system::system_error& e)
 	{
-
+		std::cerr << "error socket close : " << e.what() << std::endl;
 	}
 	manager->removeBuffer(id);
 	std::cout << "id " << id << " has been disconnected" << std::endl;

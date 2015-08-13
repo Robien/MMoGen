@@ -58,19 +58,26 @@ void LoginServer::onEvent(NetworkEvent& event)
 		}
 		else
 		{
-			clients.erase(client);
-
-			client = clients.find(client->second->getFriend());
-
-			if (client != clients.end())
+			if (client->second->getFriend() != 0)
 			{
-				sendInGameRemoteDisconnection(client->second->getId());
-				client->second->setIsAlone();
+				std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::iterator clientFriend = clients.find(client->second->getFriend());
+
+				if (clientFriend != clients.end())
+				{
+					std::cout << "sending to client " << clientFriend->second->getId() << " a disconnection message ..." << std::endl;
+					sendInGameRemoteDisconnection(clientFriend->second->getId());
+					clientFriend->second->setIsAlone();
+				}
+				else
+				{
+					std::cout << "client with id " << event.id << " has no friend ! (2) " << std::endl;
+				}
 			}
 			else
 			{
-				std::cout << "client with id " << event.id << " has no friend ! " << std::endl;
+				std::cout << "client with id " << event.id << " has no friend ! (1)" << std::endl;
 			}
+			clients.erase(client);
 		}
 		mutexInterClient.unlock();
 
