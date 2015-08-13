@@ -24,12 +24,13 @@ int main(int argc, char* argv[])
 	// Declare the supported options.
 	boost::program_options::options_description desc("Allowed options");
 	desc.add_options()
-	    ("help", "produce help message")
-	    ("server", "TCP server (default)")
-	    ("client", "TCP test client")
-	    ("UPS", "Unity Policy Server")
-	    ("web", "web Server")
-	    ("port", boost::program_options::value<int>()->default_value(12345), "port of the server (default 12345)")
+	    ("help,h", "produce this help message")
+	    ("server,s", "TCP server (default)")
+	    ("client,c", "TCP test client")
+	    ("UPS", "Unity Policy Server (EXPERIMENTAL)")
+	    ("web", "web Server (EXPERIMENTAL)")
+	    ("web-port", boost::program_options::value<int>()->default_value(8080), "port of the web server")
+	    ("port,p", boost::program_options::value<int>()->default_value(12345), "port of the server")
 	    ("host", boost::program_options::value<std::string>()->default_value("127.0.0.1"), "host of the server (only in client mode)")
 	;
 
@@ -51,14 +52,14 @@ int main(int argc, char* argv[])
 	}
 	if (vm.count("web"))
 	{
-		WebServer ws(NULL);
+		WebServer ws(NULL, vm["port"].as<int>());
 		ws.run();
 		return 0;
 	}
 
 	if (!vm.count("client"))
 	{
-		LoginServer server(vm["port"].as<int>());
+		LoginServer server(vm["port"].as<int>(), vm["web-port"].as<int>());
 		server.listen();
 	}
 	else

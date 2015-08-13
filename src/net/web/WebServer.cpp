@@ -10,8 +10,8 @@
 #include <net/UnityPolicyServer.h>
 #include <net/web/WebServer.h>
 
-WebServer::WebServer(NetworkManager* gameManager) :
-		gameManager(gameManager)
+WebServer::WebServer(NetworkManager* gameManager, unsigned int port) :
+		port(port), gameManager(gameManager)
 {
 	manager.getNetworkEventManager()->addEventReceiver(this);
 }
@@ -23,7 +23,7 @@ WebServer::~WebServer()
 void WebServer::run()
 {
 	boost::asio::io_service io;
-	ServerListener server(io, 8080, &manager, true);
+	ServerListener server(io, port, &manager, true);
 
 	server.listen();
 
@@ -70,5 +70,9 @@ void WebServer::onEvent(NetworkEvent& event)
 		std::cout << "Unhandled id :" << event.id << std::endl;
 		break;
 	}
+}
+unsigned int WebServer::getPort()
+{
+	return port;
 }
 

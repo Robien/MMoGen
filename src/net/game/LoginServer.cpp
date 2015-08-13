@@ -10,8 +10,8 @@
 
 #include "proto/src/Connection.pb.h"
 
-LoginServer::LoginServer(unsigned int port) :
-		TCPServer(port, true)
+LoginServer::LoginServer(unsigned int port, unsigned int webPort) :
+		TCPServer(port, true, webPort)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	waiting.reset();

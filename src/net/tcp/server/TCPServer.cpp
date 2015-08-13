@@ -9,8 +9,8 @@
 #include "net/tcp/server/TCPServer.h"
 #include "net/common/NetworkEventManager.h"
 
-TCPServer::TCPServer(unsigned int port, bool withWebServer) :
-	manager(withWebServer ? new WebServer(&manager) : NULL), port(port)
+TCPServer::TCPServer(unsigned int port, bool withWebServer, unsigned int webPort) :
+		manager(withWebServer ? new WebServer(&manager, webPort) : NULL), port(port)
 {
 	manager.getNetworkEventManager()->addEventReceiver(this);
 	server = NULL;
@@ -35,6 +35,8 @@ void TCPServer::listen()
 
 					server->listen();
 
+					std::cout << "TCPServer started on port : " << port << std::endl;
+
 					io.run();
 				}
 				catch (boost::system::system_error& e)
@@ -44,8 +46,7 @@ void TCPServer::listen()
 				io.reset();
 				exit(0); //TEMP kill the server to be sure to not being blocked in a infinite loop
 			}
-		}
-		catch (std::exception& e)
+		} catch (std::exception& e)
 		{
 			std::cerr << "Error listen : " << e.what() << std::endl;
 		}

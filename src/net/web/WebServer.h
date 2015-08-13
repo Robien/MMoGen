@@ -22,8 +22,11 @@
 class WebServer : public NetworkEventReceiver, public Thread
 {
 public:
-	WebServer(NetworkManager* gameManager);
+	WebServer(NetworkManager* gameManager, unsigned int port);
 	virtual ~WebServer();
+
+public:
+	unsigned int getPort();
 
 public:
 	void onEvent(NetworkEvent& event);
@@ -31,6 +34,7 @@ public:
 	void run();
 
 private:
+	unsigned int port;
 	NetworkManager manager;
 	NetworkManager* gameManager;
 

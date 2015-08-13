@@ -16,8 +16,8 @@ NetworkManager::NetworkManager(WebServer* webserver) :
 {
 	if (webserver)
 	{
-		std::cout << "start webserver" << std::endl;
 		webserver->start();
+		std::cout << "Web server started on port " << webserver->getPort() << std::endl;
 	}
 }
 

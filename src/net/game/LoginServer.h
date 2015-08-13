@@ -19,7 +19,7 @@
 class LoginServer: public TCPServer
 {
 public:
-	LoginServer(unsigned int port);
+	LoginServer(unsigned int port, unsigned int webPort = 8080);
 	virtual ~LoginServer();
 
 public:
