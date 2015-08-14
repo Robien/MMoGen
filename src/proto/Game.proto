@@ -44,5 +44,29 @@ message Move
 message Attack
 {
 	required Case from = 1;
-	required Case target = 3;
+	required Case target = 2;
+}
+
+message CaseMap
+{
+	enum ECaseType
+	{
+		GRASS = 1;
+		ROAD = 2;
+	}
+	
+	enum EUnitType
+	{
+		RED_GUERRIER = 1;
+		BLUE_GERRIER = 2;
+	}
+	
+	required ECaseType type = 1;
+	optional EUnitType unit = 2;
+}
+
+message Map
+{
+	required string name = 1;
+	repeated CaseMap cases = 2;
 }
