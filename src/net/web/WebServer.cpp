@@ -30,21 +30,32 @@ void WebServer::run()
 	io.run();
 }
 
+static std::string intToStr(int a)
+{
+	std::stringstream ss;
+	ss << a;
+	return (ss.str());
+}
+
 void WebServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
 	std::cout.write(&(*message->getData())[0], message->getDataSize());
 
 	std::cout << std::endl;
 
-	std::string m = "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: 107\r\nDate: Mon, 24 Nov 2014 10:21:21 GMT\r\n\r\n";
+	std::string data;
 	if (gameManager != NULL)
 	{
-		m += gameManager->getJSONData();
+		data = gameManager->getJSONData();
 	}
 	else
 	{
-		m += "NO DATA";
+		data = "NO DATA";
 	}
+
+	std::string m = "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: " + intToStr(data.size()) + "\r\nDate: Mon, 24 Nov 2014 10:21:21 GMT\r\n\r\n";
+	m += data;
+	std::cout << "### : " << m.size() << std::endl;
 	boost::shared_ptr<NetworkMessageOut> messageOut = NetworkMessageOut::factory(message->getSenderId(), m);
 	boost::shared_ptr<NetworkMessageOut> messageEnd(new NetworkMessageOut(true, message->getSenderId()));
 	messageOut->setRaw();
