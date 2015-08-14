@@ -7,6 +7,7 @@
 
 #ifndef CLIENT_H_
 #define CLIENT_H_
+#include <time/Timer.h>
 
 namespace loginServer
 {
@@ -39,10 +40,17 @@ namespace loginServer
 		void setIsAlone();
 		unsigned int getFriend();
 
+	public:
+		Timer* getGameTimer();
+		float getWaitingTime();
+
 	private:
 		unsigned int id;
 		status clientStatus;
 		unsigned int friendId;
+		Timer gameTimer;
+		Timer waitingTimer;
+		float waitingTime;
 	};
 
 } /* namespace loginServer */

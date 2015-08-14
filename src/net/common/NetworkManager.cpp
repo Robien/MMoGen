@@ -12,21 +12,17 @@
 #include <net/web/WebServer.h>
 
 NetworkManager::NetworkManager(WebServer* webserver) :
-		webserver(webserver), nbConnected(0), maxId(1)
+		nbGame(NULL), nbPlayerInGame(NULL), totalNbGame(0), averageWaitingTime(0), totalSecondPlayed(0), webserver(webserver), nbConnected(0), maxId(
+				1)
 {
 	if (webserver)
 	{
 		webserver->start();
 		std::cout << "Web server started on port " << webserver->getPort() << std::endl;
+		uptime.start();
 	}
 }
 
-std::string intToStr(int a)
-{
-	std::stringstream ss;
-	ss << a;
-	return (ss.str());
-}
 
 NetworkManager::~NetworkManager()
 {
@@ -52,8 +48,9 @@ int NetworkManager::getNewId()
 	}
 	else
 	{
+		unsigned int id = maxId++;
 		mutexId.unlock();
-		return maxId++;
+		return id;
 	}
 }
 
@@ -72,13 +69,16 @@ void NetworkManager::removeIdNSV2(unsigned int id)
 		anusedId.clear();
 		maxId = 1;
 	}
-	if (id + 1 == maxId)
-	{
-		maxId--;
-	}
 	else
 	{
-		anusedId.push_back(id);
+		if (id + 1 == maxId)
+		{
+			maxId--;
+		}
+		else
+		{
+			anusedId.push_back(id);
+		}
 	}
 }
 void NetworkManager::removeIdNS(unsigned int id)
@@ -147,6 +147,33 @@ NetworkEventManager* NetworkManager::getNetworkEventManager()
 	return &networkEventManager;
 }
 
+unsigned int** NetworkManager::getNbGamePtr()
+{
+	return &nbGame;
+}
+unsigned int** NetworkManager::getNbPlayerInGamePtr()
+{
+	return &nbPlayerInGame;
+}
+
+unsigned int** NetworkManager::getTotalNbGamePtr()
+{
+	return &totalNbGame;
+}
+float** NetworkManager::getAverageWaitingTimePtr()
+{
+	return &averageWaitingTime;
+}
+float** NetworkManager::getTotalSecondPlayedPtr()
+{
+	return &totalSecondPlayed;
+}
+
+float keepOnlyTwoDecimal(float nb)
+{
+	return (((float)(std::floor((nb*100)))) / (float) 100);
+}
+
 std::string NetworkManager::getJSONData()
 {
 
@@ -156,6 +183,28 @@ std::string NetworkManager::getJSONData()
 	boost::shared_ptr<JSONObject> json(new JSONObject());
 
 	(*json.get())[L"nb_connected"] = new JSONValue((double) nbConnectedSave);
+	(*json.get())[L"uptime"] = new JSONValue((double) uptime.getValueinSecond());
+
+	if (nbGame != NULL)
+	{
+		(*json.get())[L"nbGame"] = new JSONValue((double) *nbGame);
+	}
+	if (nbPlayerInGame != NULL)
+	{
+		(*json.get())[L"nbPlayerInGame"] = new JSONValue((double) *nbPlayerInGame);
+	}
+	if (totalNbGame != NULL)
+	{
+		(*json.get())[L"totalNbGame"] = new JSONValue((double) *totalNbGame);
+	}
+	if (averageWaitingTime != NULL)
+	{
+		(*json.get())[L"averageWaitingTime"] = new JSONValue((double) keepOnlyTwoDecimal(*averageWaitingTime));
+	}
+	if (totalSecondPlayed != NULL)
+	{
+		(*json.get())[L"totalTimePlayed"] = new JSONValue((double) keepOnlyTwoDecimal(*totalSecondPlayed));
+	}
 
 	JSONValue value(*json.get());
 

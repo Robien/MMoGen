@@ -45,6 +45,13 @@ private:
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> > clients;
 
 private:
+	unsigned int nbGame;
+	unsigned int nbPlayerInGame;
+	unsigned int totalNbGame;
+	float averageWaitingTime;
+	float totalSecondPlayed;
+
+private:
 	MutexAuto mutexInterClient;
 };
 

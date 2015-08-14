@@ -11,14 +11,25 @@
 #include "proto/src/Connection.pb.h"
 
 LoginServer::LoginServer(unsigned int port, unsigned int webPort) :
-		TCPServer(port, true, webPort)
+		TCPServer(port, true, webPort), nbGame(0), nbPlayerInGame(0), totalNbGame(0), averageWaitingTime(0), totalSecondPlayed(0)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	waiting.reset();
+
+	*(getManager().getNbGamePtr()) = &nbGame;
+	*(getManager().getNbPlayerInGamePtr()) = &nbPlayerInGame;
+	*(getManager().getTotalNbGamePtr()) = &totalNbGame;
+	*(getManager().getAverageWaitingTimePtr()) = &averageWaitingTime;
+	*(getManager().getTotalSecondPlayedPtr()) = &totalSecondPlayed;
 }
 
 LoginServer::~LoginServer()
 {
+	*(getManager().getNbGamePtr()) = NULL;
+	*(getManager().getNbPlayerInGamePtr()) = NULL;
+	*(getManager().getTotalNbGamePtr()) = NULL;
+	*(getManager().getAverageWaitingTimePtr()) = NULL;
+	*(getManager().getTotalSecondPlayedPtr()) = NULL;
 }
 
 void LoginServer::onEvent(NetworkEvent& event)
@@ -58,8 +69,17 @@ void LoginServer::onEvent(NetworkEvent& event)
 		}
 		else
 		{
+			if (client->second->getStatus() == loginServer::Client::INGAME || client->second->getStatus() == loginServer::Client::ALONE)
+			{
+				nbPlayerInGame--;
+				if (client->second->getStatus() == loginServer::Client::INGAME)
+				{
+					totalSecondPlayed += client->second->getGameTimer()->getValueinSecond();
+				}
+			}
 			if (client->second->getFriend() != 0)
 			{
+				nbGame--;
 				std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::iterator clientFriend = clients.find(client->second->getFriend());
 
 				if (clientFriend != clients.end())
@@ -156,6 +176,7 @@ void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 	}
 	else
 	{
+		client->second->setStartMM();
 		std::cout << "waiting" << std::endl;
 		client->second->setFriend(waiting->getId());
 		client->second->setWaitingForReady();
@@ -219,6 +240,11 @@ void LoginServer::sendStartGame(unsigned int id, bool isMain)
 void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player1,
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player2)
 {
+	averageWaitingTime = averageWaitingTime * (2 * totalNbGame) + player1->second->getWaitingTime() + player2->second->getWaitingTime();
+	nbGame++;
+	totalNbGame++;
+	nbPlayerInGame += 2;
+	averageWaitingTime /= (2 * totalNbGame);
 	sendStartGame(player1->second->getId(), true);
 	sendStartGame(player2->second->getId(), false);
 	std::cout << "starting game with id : " << player1->second->getId() << " and id : " << player2->second->getId() << std::endl;

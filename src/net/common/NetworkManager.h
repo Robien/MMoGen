@@ -13,6 +13,7 @@
 #include <net/common/NetworkEventManager.h>
 #include <net/common/NetworkMessageOut.h>
 #include <thread/MutexAuto.h>
+#include <time/Timer.h>
 #include <vector>
 
 #include "NetworkMessage.h"
@@ -45,10 +46,23 @@ public:
 
 public:
 	std::string getJSONData();
+	unsigned int** getNbGamePtr();
+	unsigned int** getNbPlayerInGamePtr();
+	unsigned int** getTotalNbGamePtr();
+	float** getAverageWaitingTimePtr();
+	float** getTotalSecondPlayedPtr();
 
 private:
 	void removeIdNS(unsigned int id);
 	void removeIdNSV2(unsigned int id);
+
+private:
+	Timer uptime;
+	unsigned int* nbGame;
+	unsigned int* nbPlayerInGame;
+	unsigned int* totalNbGame;
+	float* averageWaitingTime;
+	float* totalSecondPlayed;
 
 private:
 	WebServer* webserver;

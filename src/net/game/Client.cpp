@@ -12,7 +12,7 @@ namespace loginServer
 {
 
 	Client::Client(unsigned int id) :
-			id(id), clientStatus(Client::DISCONNECTED), friendId(0)
+			id(id), clientStatus(Client::DISCONNECTED), friendId(0), waitingTime(0)
 	{
 	}
 
@@ -48,6 +48,7 @@ namespace loginServer
 	}
 	void Client::setStartMM()
 	{
+		waitingTimer.start();
 		clientStatus = Client::IN_MM;
 	}
 	void Client::setWaitingForReady()
@@ -60,6 +61,8 @@ namespace loginServer
 	}
 	void Client::setInGame()
 	{
+		waitingTime = waitingTimer.getValueinSecond();
+		gameTimer.start();
 		clientStatus = Client::INGAME;
 	}
 	void Client::setFriend(unsigned int id)
@@ -96,6 +99,15 @@ namespace loginServer
 	unsigned int Client::getFriend()
 	{
 		return friendId;
+	}
+
+	Timer* Client::getGameTimer()
+	{
+		return &gameTimer;
+	}
+	float Client::getWaitingTime()
+	{
+		return waitingTime;
 	}
 
 } /* namespace loginServer */
