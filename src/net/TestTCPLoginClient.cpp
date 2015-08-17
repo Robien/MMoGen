@@ -101,20 +101,25 @@ void TestTCPLoginClient::onEvent(NetworkEvent& event)
 
 void TestTCPLoginClient::startMM()
 {
-	Connection::MM mm;
+	Connection::ConnectionMessageClient cmc;
 
-	mm.set_command(Connection::MM_EMMCommandType_START);
-	mm.set_elo(0);
-	mm.set_versionmajor(0);
-	mm.set_versionminor(0);
+	cmc.set_type(Connection::ConnectionMessageClient_ConnectionMessageTypeClient_START_MATCH_MAKING);
 
-	manager.sendMessage(NetworkMessageOut::factory(0, mm.SerializeAsString()));
+	Connection::StartMatchMaking* smm = cmc.mutable_startmatchmaking();
+
+	smm->set_elo(0);
+	smm->set_versionmajor(0);
+	smm->set_versionminor(0);
+
+	manager.sendMessage(NetworkMessageOut::factory(0, cmc.SerializeAsString()));
 }
 void TestTCPLoginClient::sendReady()
 {
-	Connection::Ready r;
+	Connection::ConnectionMessageClient cmc;
 
-	manager.sendMessage(NetworkMessageOut::factory(0, r.SerializeAsString()));
+	cmc.set_type(Connection::ConnectionMessageClient_ConnectionMessageTypeClient_READY);
+
+	manager.sendMessage(NetworkMessageOut::factory(0, cmc.SerializeAsString()));
 }
 
 void TestTCPLoginClient::sendPingMessage()

@@ -1,50 +1,48 @@
 package Connection;
 
-message MessageClientType
+message ConnectionMessageClient
 {
-	enum EMessageClientType
+	enum ConnectionMessageTypeClient
 	{
-		MM = 0;
-		Ready = 1;
+		START_MATCH_MAKING = 0;
+		STOP_MATCH_MAKING = 1;
+		READY = 2;
 	}
+	
+	required ConnectionMessageTypeClient type = 1;
+	
+	optional StartMatchMaking startMatchMaking = 2;
 }
 
-message MessageServerType
+message ConnectionMessageServer
 {
-	enum EMessageServerType
+	enum ConnectionMessageTypeServer
 	{
-		ACKMM = 0;
-		MatchFound = 1;
+		ACK_MATCH_MAKING = 1;
+		MATCH_FOUND = 2;
+		START_GAME = 3;
 	}
+		
+	required ConnectionMessageTypeServer type = 1;
+	
+	optional ACKMM ackmm = 2;
+	optional StartGame startGame = 3;
 }
 
-message MM 
+message StartMatchMaking
 {
-
-	enum EMMCommandType
-	{
-		START = 0;
-		STOP = 1;
-	}
-
 	required int32 versionMajor = 1;
 	required int32 versionMinor = 2;
 
-	optional EMMCommandType command = 3 [default = START];
-	optional int32 Elo = 4 [default = 0];
+	optional int32 Elo = 3 [default = 0];
+	
+	optional string myName = 4;
+	optional string challengedName = 5;
 }
 
 message ACKMM
 {
 	required bool isOk = 1;
-}
-
-message MatchFound
-{
-}
-
-message Ready
-{
 }
 
 message StartGame

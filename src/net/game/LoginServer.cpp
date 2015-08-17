@@ -156,17 +156,23 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client)
 {
-	Connection::MM mm;
-	if (!mm.ParseFromArray(message->getData()->c_array(), message->getDataSize()))
+
+	Connection::ConnectionMessageClient cmc;
+
+	if (!cmc.ParseFromArray(message->getData()->c_array(), message->getDataSize()))
 	{
 		std::cerr << "Failed to parse MM message." << std::endl;
 	}
 
-	Connection::ACKMM ack;
+	Connection::ConnectionMessageServer cmsAck;
 
-	ack.set_isok(true);
+	cmsAck.set_type(Connection::ConnectionMessageServer_ConnectionMessageTypeServer_ACK_MATCH_MAKING);
 
-	std::string ackStr = ack.SerializeAsString();
+	Connection::ACKMM* ack = cmsAck.mutable_ackmm();
+
+	ack->set_isok(true);
+
+	std::string ackStr = cmsAck.SerializeAsString();
 
 	if (!waiting)
 	{
@@ -195,9 +201,9 @@ void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 void LoginServer::computeREADYMessage(boost::shared_ptr<NetworkMessage> message,
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client)
 {
-	Connection::Ready ready;
+	Connection::ConnectionMessageClient cmc;
 
-	if (!ready.ParseFromArray(message->getData()->c_array(), message->getDataSize()))
+	if (!cmc.ParseFromArray(message->getData()->c_array(), message->getDataSize()))
 	{
 		std::cerr << "Failed to parse READY message." << std::endl;
 	}
@@ -221,19 +227,25 @@ void LoginServer::computeREADYMessage(boost::shared_ptr<NetworkMessage> message,
 
 void LoginServer::sendMFMessage(unsigned int id)
 {
-	Connection::MatchFound mf;
+	Connection::ConnectionMessageServer cmsMF;
 
-	std::string mfStr = mf.SerializeAsString();
+	cmsMF.set_type(Connection::ConnectionMessageServer_ConnectionMessageTypeServer_MATCH_FOUND);
+
+	std::string mfStr = cmsMF.SerializeAsString();
 	getManager().sendMessage(NetworkMessageOut::factory(id, mfStr));
 }
 
 void LoginServer::sendStartGame(unsigned int id, bool isMain)
 {
-	Connection::StartGame sg;
+	Connection::ConnectionMessageServer cmsSG;
 
-	sg.set_ismain(isMain);
+	cmsSG.set_type(Connection::ConnectionMessageServer_ConnectionMessageTypeServer_START_GAME);
 
-	std::string sgStr = sg.SerializeAsString();
+	Connection::StartGame* sg = cmsSG.mutable_startgame();
+
+	sg->set_ismain(isMain);
+
+	std::string sgStr = sg->SerializeAsString();
 	getManager().sendMessage(NetworkMessageOut::factory(id, sgStr));
 }
 
