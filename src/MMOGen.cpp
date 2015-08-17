@@ -1,10 +1,9 @@
-//============================================================================
-// Name        : MMOGen.cpp
-// Author      : 
-// Version     :
-// Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
-//============================================================================
+/*
+ * LoginServer.cpp
+ *
+ *  Created on: 30 janv. 2015
+ *      Author: rguyard
+ */
 
 #include <net/TestTCPClient.h>
 #include <net/TestTCPLoginClient.h>
@@ -21,7 +20,6 @@
 int main(int argc, char* argv[])
 {
 
-	// Declare the supported options.
 	boost::program_options::options_description desc("Allowed options");
 	desc.add_options()
 	    ("help,h", "produce this help message")

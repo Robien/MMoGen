@@ -26,7 +26,6 @@ public:
 	{
 		if (pipe(pipes) == -1)
 		{
-//			AAPLOGE("Error creating pipe for BufferToFd");
 		}
 		else
 		{
@@ -54,7 +53,6 @@ public:
 			free(data.data);
 			if (ret == -1 || (unsigned int) ret != data.len)
 			{
-//				AAPLOGE("Error when writing from buffer to pipe : ret = %d !", ret);
 				break;
 			}
 		}

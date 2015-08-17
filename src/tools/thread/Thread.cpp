@@ -1,7 +1,10 @@
-// Copyright 2014 Google Inc. All Rights Reserved.
-
 #include "Thread.h"
 #include <iostream>
+
+Thread::Thread() :
+		mThread(0), mRunning(false)
+{
+}
 
 void* Thread::callback(void* arg)
 {
@@ -12,10 +15,6 @@ void* Thread::callback(void* arg)
 
 Thread::~Thread()
 {
-	if (mRunning)
-	{
-//		AAPLOGW("Thread %lx went out of scope while running!", (unsigned long ) mThread);
-	}
 }
 
 bool Thread::start()
@@ -72,7 +71,6 @@ bool Thread::setName(const char* name)
 	}
 	else
 	{
-		std::cout << "#################### SetName Error : " << name << std::endl;
 		return false;
 	}
 }

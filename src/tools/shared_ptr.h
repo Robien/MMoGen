@@ -5,8 +5,8 @@
  *      Author: rguyard
  */
 
-#ifndef ANDROID_AUTO_PROJECTION_PROTOCOL_CORE_UTIL_SHARED_PTR_H
-#define ANDROID_AUTO_PROJECTION_PROTOCOL_CORE_UTIL_SHARED_PTR_H
+#ifndef UTIL_SHARED_PTR_H
+#define UTIL_SHARED_PTR_H
 
 #ifdef __QNXNTO__
 #include <atomic.h>
@@ -21,7 +21,6 @@
  * A partial implementation of a shared pointer. This implementation only
  * has the methods that we need and so is a subset of std::shared_ptr.
  *
- * TODO: Customize this to work on your platform.
  */
 
 template<typename T> class shared_ptr
@@ -145,4 +144,4 @@ private:
 	T* mPtr;
 };
 
-#endif // ANDROID_AUTO_PROJECTION_PROTOCOL_CORE_UTIL_SHARED_PTR_H
+#endif // UTIL_SHARED_PTR_H
