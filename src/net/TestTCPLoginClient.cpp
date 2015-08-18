@@ -14,7 +14,8 @@
 #include "tcp/client/ClientConnectAndPrint.h"
 #include "proto/src/Connection.pb.h"
 
-TestTCPLoginClient::TestTCPLoginClient(std::string host, unsigned int port) : host(host), port(port)
+TestTCPLoginClient::TestTCPLoginClient(std::string host, unsigned int port) :
+		host(host), port(port)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	manager.getNetworkEventManager()->addEventReceiver(this);
@@ -50,28 +51,48 @@ void TestTCPLoginClient::onMessageReceived(boost::shared_ptr<NetworkMessage> mes
 
 	if (status == 0)
 	{
+		Connection::ConnectionMessageServer cms;
+
+		cms.ParseFromArray(message->getData()->c_array(), message->getDataSize());
+
+		std::cout << cms.ShortDebugString() << std::endl;
+		if (cms.type() == Connection::ConnectionMessageServer_ConnectionMessageTypeServer_ACK_MATCH_MAKING)
+		{
+			Connection::ACKMM ackmm = cms.ackmm();
+
+			if (!ackmm.isok())
+			{
+				io.stop();
+			}
+		}
 	}
 	else if (status == 1)
 	{
+		Connection::ConnectionMessageServer cms;
+
+		cms.ParseFromArray(message->getData()->c_array(), message->getDataSize());
+
+		std::cout << cms.ShortDebugString() << std::endl;
 		sendReady();
 	}
 	else if (status == 2)
 	{
 		std::cout << "INGAME !!!" << std::endl;
 
-		
-	Connection::StartGame sg;
+		Connection::ConnectionMessageServer cms;
 
-	sg.ParseFromArray(message->getData()->c_array(), message->getDataSize());
+		cms.ParseFromArray(message->getData()->c_array(), message->getDataSize());
 
-	if (sg.ismain())
-	{
-		std::cout << "IS MAIN !" << std::endl;
-	}
-	else
-	{
-		std::cout << "IS NOT MAIN !" << std::endl;
-	}
+		Connection::StartGame sg = cms.startgame();
+
+		if (sg.ismain())
+		{
+			std::cout << "IS MAIN !" << std::endl;
+		}
+		else
+		{
+			std::cout << "IS NOT MAIN !" << std::endl;
+		}
 
 		timerCaller.callMeIn(this, 1000);
 	}
@@ -164,7 +185,7 @@ void TestTCPLoginClient::computeInGameMessage(boost::shared_ptr<NetworkMessage> 
 
 	if (messageType.type() == Game::MessageType::PING)
 	{
-		sendPongMessage(messageType.pong().id());
+		sendPongMessage(messageType.ping().id());
 	}
 	else if (messageType.type() == Game::MessageType::PONG)
 	{

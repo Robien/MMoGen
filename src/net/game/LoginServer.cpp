@@ -10,8 +10,9 @@
 
 #include "proto/src/Connection.pb.h"
 
-LoginServer::LoginServer(unsigned int port, unsigned int webPort) :
-		TCPServer(port, true, webPort), nbGame(0), nbPlayerInGame(0), totalNbGame(0), averageWaitingTime(0), totalSecondPlayed(0)
+LoginServer::LoginServer(unsigned int port, bool printInGameMessages, unsigned int webPort) :
+		TCPServer(port, true, webPort), printInGameMessages(printInGameMessages), nbGame(0), nbPlayerInGame(0), totalNbGame(0), averageWaitingTime(0), totalSecondPlayed(
+				0)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	waiting.reset();
@@ -79,7 +80,6 @@ void LoginServer::onEvent(NetworkEvent& event)
 			}
 			if (client->second->getFriend() != 0)
 			{
-				nbGame--;
 				std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::iterator clientFriend = clients.find(client->second->getFriend());
 
 				if (clientFriend != clients.end())
@@ -87,6 +87,12 @@ void LoginServer::onEvent(NetworkEvent& event)
 					std::cout << "sending to client " << clientFriend->second->getId() << " a disconnection message ..." << std::endl;
 					sendInGameRemoteDisconnection(clientFriend->second->getId());
 					clientFriend->second->setIsAlone();
+					clientFriend->second->setFriend(0);
+					if (client->second->getStatus() == loginServer::Client::INGAME)
+					{
+						std::cout << "nbGame--" << std::endl;
+						nbGame--;
+					}
 				}
 				else
 				{
@@ -107,7 +113,6 @@ void LoginServer::onEvent(NetworkEvent& event)
 }
 void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
-	std::cout << "received a message from id " << message->getSenderId() << std::endl;
 	mutexInterClient.lock();
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client = clients.find(message->getSenderId());
 	mutexInterClient.unlock();
@@ -137,9 +142,16 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			client->second->printStatus();
 			break;
 		case loginServer::Client::INGAME:
-			std::cout << "status : INGAME" << std::endl;
 			//TODO : avoid copy
 			getManager().sendMessage(NetworkMessageOut::factory(message, client->second->getFriend()));
+
+			if (printInGameMessages)
+			{
+				Game::MessageType mt;
+				mt.ParseFromArray(message->getData()->c_array(), message->getDataSize());
+				std::cout << "[" << message->getSenderId() << "] " << mt.ShortDebugString() << std::endl;
+			}
+
 			break;
 		case loginServer::Client::DISCONNECTED:
 			std::cout << "status : DISCONNECTED" << std::endl;
@@ -175,7 +187,17 @@ void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 
 	Connection::ACKMM* ack = cmsAck.mutable_ackmm();
 
-	ack->set_isok(true);
+	if (nbGame < 500)
+	{
+		std::cout << "IS OK" << std::endl;
+		ack->set_isok(true);
+	}
+	else
+	{
+		std::cout << "IS NOT OK" << std::endl;
+		ack->set_isok(false);
+		client->second->setIsAlone();
+	}
 
 	std::string ackStr = cmsAck.SerializeAsString();
 
@@ -259,6 +281,7 @@ void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player2)
 {
 	averageWaitingTime = averageWaitingTime * (2 * totalNbGame) + player1->second->getWaitingTime() + player2->second->getWaitingTime();
+	std::cout << "nbGame++" << std::endl;
 	nbGame++;
 	totalNbGame++;
 	nbPlayerInGame += 2;

@@ -121,7 +121,7 @@ void ServerConnexionHandler::handle_readHeader(const boost::system::error_code& 
 		size |= (network_buffer_header[2] << 8);
 		size |= (network_buffer_header[3]);
 
-		std::cout << "Server : get a message : " << size << " bytes" << std::endl;
+//		std::cout << "Server : get a message : " << size << " bytes" << std::endl;
 		if (size > MAX_SIZE_PACKET)
 		{
 			std::cout << "error : message too large" << std::endl;

@@ -20,7 +20,7 @@
 class LoginServer: public TCPServer
 {
 public:
-	LoginServer(unsigned int port, unsigned int webPort = 8080);
+	LoginServer(unsigned int port, bool printInGameMessages, unsigned int webPort = 8080);
 	virtual ~LoginServer();
 
 public:
@@ -44,6 +44,9 @@ private:
 private:
 	boost::shared_ptr<loginServer::Client> waiting;
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> > clients;
+
+private:
+	bool printInGameMessages;
 
 private:
 	unsigned int nbGame;
