@@ -28,6 +28,8 @@ int main(int argc, char* argv[])
 	    ("UPS", "Unity Policy Server (EXPERIMENTAL)")
 	    ("web", "web Server (EXPERIMENTAL)")
 	    ("print", "print in game messages")
+	    ("name", boost::program_options::value<std::string>()->default_value(""), "my name")
+	    ("duel-name", boost::program_options::value<std::string>()->default_value(""), "name of the person you want to play with")
 	    ("web-port", boost::program_options::value<int>()->default_value(8080), "port of the web server")
 	    ("port,p", boost::program_options::value<int>()->default_value(12345), "port of the server")
 	    ("host", boost::program_options::value<std::string>()->default_value("127.0.0.1"), "host of the server (only in client mode)")
@@ -64,6 +66,8 @@ int main(int argc, char* argv[])
 	else
 	{
 		TestTCPLoginClient client(vm["host"].as<std::string>(), vm["port"].as<int>());
+		client.setDuelName(vm["duel-name"].as<std::string>());
+		client.setName(vm["name"].as<std::string>());
 		client.run();
 	}
 

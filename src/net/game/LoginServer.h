@@ -44,6 +44,7 @@ private:
 private:
 	boost::shared_ptr<loginServer::Client> waiting;
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> > clients;
+	std::map<std::string, boost::shared_ptr<loginServer::Client> > clientsWaitingForSomeone;
 
 private:
 	bool printInGameMessages;

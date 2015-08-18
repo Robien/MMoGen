@@ -29,6 +29,8 @@ public:
 	void onEvent(NetworkEvent& event);
 	void onMessageReceived(boost::shared_ptr<NetworkMessage> message);
 	void run();
+	void setDuelName(std::string name);
+	void setName(std::string name);
 
 private:
 	void startMM();
@@ -51,6 +53,10 @@ private:
 	boost::asio::io_service io;
 	std::string host;
 	unsigned int port;
+
+private:
+	std::string name;
+	std::string duelName;
 };
 
 #endif /* TESTTCPLOGINCLIENT_H_ */

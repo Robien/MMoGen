@@ -21,6 +21,8 @@ TestTCPLoginClient::TestTCPLoginClient(std::string host, unsigned int port) :
 	manager.getNetworkEventManager()->addEventReceiver(this);
 	status = 0;
 	pingId = 0;
+	name = "";
+	duelName = "";
 }
 
 TestTCPLoginClient::~TestTCPLoginClient()
@@ -43,12 +45,6 @@ void TestTCPLoginClient::run()
 
 void TestTCPLoginClient::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
-//	std::cout.write(&(*message->getData())[0], message->getDataSize());
-//
-//	manager.sendMessage(NetworkMessageOut::factory(message->getSenderId(), message->getData()->c_array()));
-//	std::cout << std::endl;
-//	std::cout << "status : " << status << std::endl;
-
 	if (status == 0)
 	{
 		Connection::ConnectionMessageServer cms;
@@ -132,7 +128,19 @@ void TestTCPLoginClient::startMM()
 	smm->set_elo(0);
 	smm->set_versionmajor(0);
 	smm->set_versionminor(0);
-	smm->set_myname(RandomStringGenerator().getString(64));
+	if (name == "")
+	{
+		smm->set_myname(RandomStringGenerator().getString(64));
+	}
+	else
+	{
+		smm->set_myname(name);
+	}
+
+	if (duelName != "")
+	{
+		smm->set_challengedname(duelName);
+	}
 
 	manager.sendMessage(NetworkMessageOut::factory(0, cmc.SerializeAsString()));
 }
@@ -201,5 +209,14 @@ void TestTCPLoginClient::computeInGameMessage(boost::shared_ptr<NetworkMessage> 
 	{
 		std::cout << "what ?" << std::endl;
 	}
+}
+
+void TestTCPLoginClient::setDuelName(std::string name)
+{
+	this->duelName = name;
+}
+void TestTCPLoginClient::setName(std::string name)
+{
+	this->name = name;
 }
 

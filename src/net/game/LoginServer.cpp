@@ -53,7 +53,7 @@ void LoginServer::onEvent(NetworkEvent& event)
 		clients.insert(std::pair<unsigned int, boost::shared_ptr<loginServer::Client> >(event.id, clientPtr));
 		mutexInterClient.unlock();
 	}
-	else
+	else //disconnection
 	{
 		mutexInterClient.lock();
 		std::cout << "[EVENT] disconnection id : " << event.id << std::endl;
@@ -70,6 +70,13 @@ void LoginServer::onEvent(NetworkEvent& event)
 		}
 		else
 		{
+			std::map<std::string, boost::shared_ptr<loginServer::Client> >::const_iterator other = clientsWaitingForSomeone.find(client->second->getName());
+			if (other != clientsWaitingForSomeone.end())
+			{
+				clientsWaitingForSomeone.erase(other->first);
+			}
+
+
 			if (client->second->getStatus() == loginServer::Client::INGAME || client->second->getStatus() == loginServer::Client::ALONE)
 			{
 				nbPlayerInGame--;
@@ -178,7 +185,6 @@ void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 
 	std::string name = cmc.startmatchmaking().myname();
 	std::cout << "name : " << name << std::endl;
-
 	client->second->setName(name);
 
 	Connection::ConnectionMessageServer cmsAck;
@@ -200,30 +206,58 @@ void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 	}
 
 	std::string ackStr = cmsAck.SerializeAsString();
+	getManager().sendMessage(NetworkMessageOut::factory(message->getSenderId(), ackStr));
 
-	if (!waiting)
+	if (cmc.startmatchmaking().has_challengedname())
 	{
-		client->second->setStartMM();
-		waiting = client->second;
-		std::cout << "!waiting" << std::endl;
+		std::string nameOther = cmc.startmatchmaking().challengedname();
+		std::map<std::string, boost::shared_ptr<loginServer::Client> >::const_iterator other = clientsWaitingForSomeone.find(nameOther);
+		if (other != clientsWaitingForSomeone.end())
+		{
+			boost::shared_ptr<loginServer::Client> duelist = other->second;
+			clientsWaitingForSomeone.erase(other->first);
+			client->second->setStartMM();
+			std::cout << "duel accepted !" << std::endl;
+			client->second->setFriend(duelist->getId());
+			client->second->setWaitingForReady();
+			duelist->setFriend(client->second->getId());
+			duelist->setWaitingForReady();
+
+			sendMFMessage(duelist->getId());
+			sendMFMessage(message->getSenderId());
+		}
+		else
+		{
+			clientsWaitingForSomeone.insert(std::pair<std::string, boost::shared_ptr<loginServer::Client> >(name, client->second));
+			client->second->setStartMM();
+			std::cout << "waiting for duelist" << std::endl;
+		}
 	}
 	else
 	{
-		client->second->setStartMM();
-		std::cout << "waiting" << std::endl;
-		client->second->setFriend(waiting->getId());
-		client->second->setWaitingForReady();
-		waiting->setFriend(client->second->getId());
-		waiting->setWaitingForReady();
 
-		sendMFMessage(waiting->getId());
-		sendMFMessage(message->getSenderId());
+		if (!waiting)
+		{
+			client->second->setStartMM();
+			waiting = client->second;
+			std::cout << "!waiting" << std::endl;
+		}
+		else
+		{
+			client->second->setStartMM();
+			std::cout << "waiting" << std::endl;
+			client->second->setFriend(waiting->getId());
+			client->second->setWaitingForReady();
+			waiting->setFriend(client->second->getId());
+			waiting->setWaitingForReady();
 
-		waiting.reset();
+			sendMFMessage(waiting->getId());
+			sendMFMessage(message->getSenderId());
+
+			waiting.reset();
+		}
+
 	}
-
-	getManager().sendMessage(NetworkMessageOut::factory(message->getSenderId(), ackStr));
-
 }
 void LoginServer::computeREADYMessage(boost::shared_ptr<NetworkMessage> message,
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client)
