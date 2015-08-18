@@ -53,7 +53,6 @@ public:
 	float** getTotalSecondPlayedPtr();
 
 private:
-	void removeIdNS(unsigned int id);
 	void removeIdNSV2(unsigned int id);
 
 private:

@@ -11,7 +11,6 @@
 #include <semaphore.h>
 #include <thread/MutexAuto.h>
 
-
 template<typename T>
 class Singleton
 {
@@ -41,7 +40,7 @@ public:
 			if (instance == 0x0)
 			{
 				instance = new T();
-				((Singleton*) instance)->onInit();
+				static_cast<Singleton*>(instance)->onInit();
 			}
 			sem_post(mutex);
 		}

@@ -81,31 +81,6 @@ void NetworkManager::removeIdNSV2(unsigned int id)
 		}
 	}
 }
-void NetworkManager::removeIdNS(unsigned int id)
-{
-	if (id + 1 == maxId)
-	{
-		maxId--;
-		for (unsigned int i = anusedId.size() - 1; i > 0 && anusedId.size() != 0; --i)
-		{
-			std::cout << "i=" << i << " anusedId.size()=" << anusedId.size() << std::endl;
-			if (anusedId[i] == maxId - 1)
-			{
-				anusedId[i] = anusedId[anusedId.size() - 1];
-				anusedId.pop_back();
-				maxId--;
-				if (anusedId.size() != 0)
-				{
-					i = anusedId.size() - 1;
-				}
-			}
-		}
-	}
-	else
-	{
-		anusedId.push_back(id);
-	}
-}
 
 void NetworkManager::reportNewBuffer(unsigned int id, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > buff)
 {

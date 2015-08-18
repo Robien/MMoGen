@@ -34,9 +34,9 @@ void ServerConnexionHandler::handler()
 }
 void ServerConnexionHandler::run()
 {
-	bool running = true;
 	try
 	{
+		bool running = true;
 		while (running)
 		{
 			boost::shared_ptr<NetworkMessageOut> message = messagesToSend->get();

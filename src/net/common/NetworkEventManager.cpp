@@ -24,7 +24,7 @@ void NetworkEventManager::addEventReceiver(NetworkEventReceiver* receiver)
 
 void NetworkEventManager::onEvent(NetworkEvent& event)
 {
-	for (std::vector<NetworkEventReceiver*>::const_iterator itt = receivers.begin(); itt != receivers.end(); itt++)
+	for (std::vector<NetworkEventReceiver*>::const_iterator itt = receivers.begin(); itt != receivers.end(); ++itt)
 	{
 		(*itt)->onEvent(event);
 	}
@@ -32,7 +32,7 @@ void NetworkEventManager::onEvent(NetworkEvent& event)
 
 void NetworkEventManager::onMessage(boost::shared_ptr<NetworkMessage> message)
 {
-	for (std::vector<NetworkEventReceiver*>::const_iterator itt = receivers.begin(); itt != receivers.end(); itt++)
+	for (std::vector<NetworkEventReceiver*>::const_iterator itt = receivers.begin(); itt != receivers.end(); ++itt)
 	{
 		(*itt)->onMessageReceived(message);
 	}

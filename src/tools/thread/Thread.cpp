@@ -8,7 +8,7 @@ Thread::Thread() :
 
 void* Thread::callback(void* arg)
 {
-	Thread* thread = (Thread*) arg;
+	Thread* thread = static_cast<Thread*>(arg);
 	thread->run();
 	return NULL;
 }
