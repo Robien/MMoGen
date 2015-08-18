@@ -10,6 +10,7 @@
 
 #include <boost/asio.hpp>
 #include <net/game/Client.h>
+#include <random/RandomGenerator.h>
 #include <thread/MutexAuto.h>
 #include "net/common/NetworkEventReceiver.h"
 #include "net/common/NetworkManager.h"
@@ -53,6 +54,9 @@ private:
 
 private:
 	MutexAuto mutexInterClient;
+
+private:
+	RandomGenerator random;
 };
 
 #endif /* LOGINSERVER_H_ */

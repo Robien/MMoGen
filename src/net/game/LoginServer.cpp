@@ -263,8 +263,9 @@ void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer
 	totalNbGame++;
 	nbPlayerInGame += 2;
 	averageWaitingTime /= (2 * totalNbGame);
-	sendStartGame(player1, true);
-	sendStartGame(player2, false);
+	bool whoIsMain = random.getBool();
+	sendStartGame(player1, whoIsMain);
+	sendStartGame(player2, !whoIsMain);
 	std::cout << "starting game with id : " << player1->second->getId() << " and id : " << player2->second->getId() << std::endl;
 }
 
