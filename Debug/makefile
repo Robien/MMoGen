@@ -11,6 +11,7 @@ RM := rm -rf
 -include third/SimpleJSON/src/subdir.mk
 -include src/tools/time/subdir.mk
 -include src/tools/thread/subdir.mk
+-include src/tools/random/subdir.mk
 -include src/tools/data/subdir.mk
 -include src/tools/subdir.mk
 -include src/proto/src/subdir.mk

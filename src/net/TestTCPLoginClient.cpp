@@ -8,6 +8,7 @@
 #include <net/common/NetworkEventManager.h>
 #include <net/TestTCPLoginClient.h>
 #include <proto/src/Game.pb.h>
+#include <random/RandomStringGenerator.h>
 #include <unistd.h>
 
 #include "tcp/client/ClientConnectAndPrint.h"
@@ -110,6 +111,7 @@ void TestTCPLoginClient::startMM()
 	smm->set_elo(0);
 	smm->set_versionmajor(0);
 	smm->set_versionminor(0);
+	smm->set_myname(RandomStringGenerator().getString(64));
 
 	manager.sendMessage(NetworkMessageOut::factory(0, cmc.SerializeAsString()));
 }

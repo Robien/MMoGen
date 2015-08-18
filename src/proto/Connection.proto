@@ -36,7 +36,7 @@ message StartMatchMaking
 
 	optional int32 Elo = 3 [default = 0];
 	
-	optional string myName = 4;
+	required string myName = 4;
 	optional string challengedName = 5;
 }
 
@@ -48,4 +48,5 @@ message ACKMM
 message StartGame
 {
 	required bool isMain = 1;
+	required string challengedName = 2;
 }

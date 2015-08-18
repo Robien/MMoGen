@@ -7,6 +7,8 @@
 
 #ifndef CLIENT_H_
 #define CLIENT_H_
+
+#include <iostream>
 #include <time/Timer.h>
 
 namespace loginServer
@@ -26,6 +28,8 @@ namespace loginServer
 
 	public:
 		unsigned int getId();
+		void setName(std::string name);
+		std::string& getName();
 
 	public:
 		status getStatus();
@@ -45,6 +49,7 @@ namespace loginServer
 		float getWaitingTime();
 
 	private:
+		std::string name;
 		unsigned int id;
 		status clientStatus;
 		unsigned int friendId;

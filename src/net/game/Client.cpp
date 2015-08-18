@@ -24,7 +24,14 @@ namespace loginServer
 	{
 		return id;
 	}
-
+	void Client::setName(std::string name)
+	{
+		this->name = name;
+	}
+	std::string& Client::getName()
+	{
+		return name;
+	}
 	Client::status Client::getStatus()
 	{
 		return clientStatus;

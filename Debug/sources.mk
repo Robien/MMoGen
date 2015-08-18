@@ -26,6 +26,7 @@ SUBDIRS := \
 third/SimpleJSON/src \
 src/tools/time \
 src/tools/thread \
+src/tools/random \
 src/tools/data \
 src/tools \
 src/proto/src \

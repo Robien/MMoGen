@@ -164,6 +164,11 @@ void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 		std::cerr << "Failed to parse MM message." << std::endl;
 	}
 
+	std::string name = cmc.startmatchmaking().myname();
+	std::cout << "name : " << name << std::endl;
+
+	client->second->setName(name);
+
 	Connection::ConnectionMessageServer cmsAck;
 
 	cmsAck.set_type(Connection::ConnectionMessageServer_ConnectionMessageTypeServer_ACK_MATCH_MAKING);
@@ -235,7 +240,7 @@ void LoginServer::sendMFMessage(unsigned int id)
 	getManager().sendMessage(NetworkMessageOut::factory(id, mfStr));
 }
 
-void LoginServer::sendStartGame(unsigned int id, bool isMain)
+void LoginServer::sendStartGame(std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player, bool isMain)
 {
 	Connection::ConnectionMessageServer cmsSG;
 
@@ -244,9 +249,10 @@ void LoginServer::sendStartGame(unsigned int id, bool isMain)
 	Connection::StartGame* sg = cmsSG.mutable_startgame();
 
 	sg->set_ismain(isMain);
+	sg->set_challengedname(player->second->getName());
 
 	std::string sgStr = sg->SerializeAsString();
-	getManager().sendMessage(NetworkMessageOut::factory(id, sgStr));
+	getManager().sendMessage(NetworkMessageOut::factory(player->second->getId(), sgStr));
 }
 
 void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player1,
@@ -257,8 +263,8 @@ void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer
 	totalNbGame++;
 	nbPlayerInGame += 2;
 	averageWaitingTime /= (2 * totalNbGame);
-	sendStartGame(player1->second->getId(), true);
-	sendStartGame(player2->second->getId(), false);
+	sendStartGame(player1, true);
+	sendStartGame(player2, false);
 	std::cout << "starting game with id : " << player1->second->getId() << " and id : " << player2->second->getId() << std::endl;
 }
 
