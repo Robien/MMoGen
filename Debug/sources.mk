@@ -36,5 +36,6 @@ src/net/tcp/client \
 src/net/game \
 src/net/common \
 src/net \
+src/common \
 src \
 

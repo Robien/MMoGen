@@ -15,6 +15,7 @@
 #include "net/game/LoginServer.h"
 
 #include <boost/program_options.hpp>
+#include <common/Constants.h>
 #include <net/web/WebServer.h>
 
 int main(int argc, char* argv[])
@@ -27,7 +28,9 @@ int main(int argc, char* argv[])
 	    ("client,c", "TCP test client")
 	    ("UPS", "Unity Policy Server (EXPERIMENTAL)")
 	    ("web", "web Server (EXPERIMENTAL)")
-	    ("print", "print in game messages")
+	    ("print", "print in-game messages")
+	    ("exit-as-soon-as-you-can", "the server will exit as soon it will not disturb any client")
+	    ("max-game", boost::program_options::value<int>()->default_value(500), "max game before the server start discard new connection")
 	    ("name", boost::program_options::value<std::string>()->default_value(""), "my name")
 	    ("duel-name", boost::program_options::value<std::string>()->default_value(""), "name of the person you want to play with")
 	    ("web-port", boost::program_options::value<int>()->default_value(8080), "port of the web server")
@@ -38,6 +41,9 @@ int main(int argc, char* argv[])
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
 	boost::program_options::notify(vm);
+
+	Constants::get()->add("exit-as-soon-as-you-can", (bool) vm.count("exit-as-soon-as-you-can"));
+	Constants::get()->add("max-game", (int) vm.count("max-game"));
 
 	if (vm.count("help"))
 	{

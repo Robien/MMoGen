@@ -12,6 +12,7 @@
 #include <net/game/Client.h>
 #include <random/RandomGenerator.h>
 #include <thread/MutexAuto.h>
+#include <time/FormattedDate.h>
 #include "net/common/NetworkEventReceiver.h"
 #include "net/common/NetworkManager.h"
 
@@ -61,6 +62,7 @@ private:
 
 private:
 	RandomGenerator random;
+	FormattedDate time;
 };
 
 #endif /* LOGINSERVER_H_ */

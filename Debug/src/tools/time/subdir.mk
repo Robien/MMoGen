@@ -4,14 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../src/tools/time/FormattedDate.cpp \
 ../src/tools/time/Timer.cpp \
 ../src/tools/time/TimerCaller.cpp 
 
 OBJS += \
+./src/tools/time/FormattedDate.o \
 ./src/tools/time/Timer.o \
 ./src/tools/time/TimerCaller.o 
 
 CPP_DEPS += \
+./src/tools/time/FormattedDate.d \
 ./src/tools/time/Timer.d \
 ./src/tools/time/TimerCaller.d 
 

@@ -21,6 +21,7 @@ RM := rm -rf
 -include src/net/game/subdir.mk
 -include src/net/common/subdir.mk
 -include src/net/subdir.mk
+-include src/common/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
 -include objects.mk

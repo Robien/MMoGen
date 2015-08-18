@@ -5,6 +5,7 @@
  *      Author: rguyard
  */
 
+#include <common/Constants.h>
 #include <net/common/NetworkEvent.h>
 #include <net/common/NetworkEventManager.h>
 #include <net/common/NetworkMessageOut.h>
@@ -68,6 +69,10 @@ void NetworkManager::removeIdNSV2(unsigned int id)
 	{
 		anusedId.clear();
 		maxId = 1;
+		if (Constants::get()->getBool("exit-as-soon-as-you-can", false))
+		{
+			exit(0);
+		}
 	}
 	else
 	{

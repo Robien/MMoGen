@@ -5,6 +5,7 @@
  *      Author: rguyard
  */
 
+#include <common/Constants.h>
 #include <proto/src/Game.pb.h>
 #include "net/game/LoginServer.h"
 
@@ -156,7 +157,18 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			{
 				Game::MessageType mt;
 				mt.ParseFromArray(message->getData()->c_array(), message->getDataSize());
-				std::cout << "[" << message->getSenderId() << "] " << mt.ShortDebugString() << std::endl;
+				if (message->getSenderId() >= 100)
+				{
+					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "]-> [" << client->second->getFriend() << "]\t " << mt.ShortDebugString() << std::endl;
+				}
+				else if (message->getSenderId() >= 10)
+				{
+					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "] -> [" << client->second->getFriend() << "]\t " << mt.ShortDebugString() << std::endl;
+				}
+				else
+				{
+					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "]  -> [" << client->second->getFriend() << "]\t " << mt.ShortDebugString() << std::endl;
+				}
 			}
 
 			break;
@@ -193,7 +205,7 @@ void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 
 	Connection::ACKMM* ack = cmsAck.mutable_ackmm();
 
-	if (nbGame < 500)
+	if (nbGame < (unsigned int) Constants::get()->getInt("max-game"))
 	{
 		std::cout << "IS OK" << std::endl;
 		ack->set_isok(true);
