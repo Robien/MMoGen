@@ -123,7 +123,6 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
 	mutexInterClient.lock();
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client = clients.find(message->getSenderId());
-	mutexInterClient.unlock();
 
 	if (client == clients.end())
 	{
@@ -182,6 +181,7 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		}
 	}
+	mutexInterClient.unlock();
 }
 
 void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
@@ -281,7 +281,6 @@ void LoginServer::computeREADYMessage(boost::shared_ptr<NetworkMessage> message,
 		std::cerr << "Failed to parse READY message." << std::endl;
 	}
 	client->second->setIsReady();
-	mutexInterClient.lock();
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator other = clients.find(client->second->getFriend());
 
 	if (other == clients.end())
@@ -295,7 +294,6 @@ void LoginServer::computeREADYMessage(boost::shared_ptr<NetworkMessage> message,
 		client->second->setInGame();
 		startGame(other, client);
 	}
-	mutexInterClient.unlock();
 }
 
 void LoginServer::sendMFMessage(unsigned int id)
