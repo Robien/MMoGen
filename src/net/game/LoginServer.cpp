@@ -98,8 +98,15 @@ void LoginServer::onEvent(NetworkEvent& event)
 					clientFriend->second->setFriend(0);
 					if (client->second->getStatus() == loginServer::Client::INGAME)
 					{
-						std::cout << "nbGame--" << std::endl;
-						nbGame--;
+						if (nbGame == 0)
+						{
+							std::cerr << "erreur nbGame" << std::endl;
+						}
+						else
+						{
+							nbGame--;
+						}
+						std::cout << "nbGame-- = " << nbGame << std::endl;
 					}
 				}
 				else
@@ -325,8 +332,8 @@ void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator player2)
 {
 	averageWaitingTime = averageWaitingTime * (2 * totalNbGame) + player1->second->getWaitingTime() + player2->second->getWaitingTime();
-	std::cout << "nbGame++" << std::endl;
 	nbGame++;
+	std::cout << "nbGame++ " << nbGame << std::endl;
 	totalNbGame++;
 	nbPlayerInGame += 2;
 	averageWaitingTime /= (2 * totalNbGame);
