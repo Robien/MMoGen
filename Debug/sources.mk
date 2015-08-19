@@ -23,19 +23,20 @@ C_UPPER_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-third/SimpleJSON/src \
 src/tools/time \
 src/tools/thread \
 src/tools/random \
 src/tools/data \
 src/tools \
+src/third/SimpleJSON/src \
 src/proto/src \
 src/net/web \
+src/net/tests \
 src/net/tcp/server \
 src/net/tcp/client \
 src/net/game \
 src/net/common \
-src/net \
+src/net/Unity \
 src/common \
 src \
 

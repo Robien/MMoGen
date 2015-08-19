@@ -8,19 +8,20 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include third/SimpleJSON/src/subdir.mk
 -include src/tools/time/subdir.mk
 -include src/tools/thread/subdir.mk
 -include src/tools/random/subdir.mk
 -include src/tools/data/subdir.mk
 -include src/tools/subdir.mk
+-include src/third/SimpleJSON/src/subdir.mk
 -include src/proto/src/subdir.mk
 -include src/net/web/subdir.mk
+-include src/net/tests/subdir.mk
 -include src/net/tcp/server/subdir.mk
 -include src/net/tcp/client/subdir.mk
 -include src/net/game/subdir.mk
 -include src/net/common/subdir.mk
--include src/net/subdir.mk
+-include src/net/Unity/subdir.mk
 -include src/common/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
@@ -58,7 +59,7 @@ all: MMOGen
 MMOGen: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu/ -L/usr/lib -o "MMOGen" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/usr/lib -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu -o "MMOGen" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

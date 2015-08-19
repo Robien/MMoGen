@@ -6,7 +6,7 @@
  */
 
 #include <net/common/NetworkEventManager.h>
-#include <net/TestTCPClient.h>
+#include <net/tests/TestTCPClient.h>
 
 #include "tcp/client/ClientConnectAndPrint.h"
 

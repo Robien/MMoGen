@@ -6,7 +6,7 @@
  */
 
 #include <net/common/NetworkEventManager.h>
-#include <net/TestTCPLoginClient.h>
+#include <net/tests/TestTCPLoginClient.h>
 #include <proto/src/Game.pb.h>
 #include <random/RandomStringGenerator.h>
 #include <unistd.h>

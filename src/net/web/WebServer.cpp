@@ -7,7 +7,6 @@
 
 #include <net/common/NetworkEventManager.h>
 #include <net/tcp/server/ServerListener.h>
-#include <net/UnityPolicyServer.h>
 #include <net/web/WebServer.h>
 
 WebServer::WebServer(NetworkManager* gameManager, unsigned int port) :
@@ -55,7 +54,6 @@ void WebServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 
 	std::string m = "HTTP/1.1 200 OK\r\nCache-Control: no-cache, private\r\nContent-Length: " + intToStr(data.size()) + "\r\nDate: Mon, 24 Nov 2014 10:21:21 GMT\r\n\r\n";
 	m += data;
-	std::cout << "### : " << m.size() << std::endl;
 	boost::shared_ptr<NetworkMessageOut> messageOut = NetworkMessageOut::factory(message->getSenderId(), m);
 	boost::shared_ptr<NetworkMessageOut> messageEnd(new NetworkMessageOut(true, message->getSenderId()));
 	messageOut->setRaw();

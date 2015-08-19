@@ -6,7 +6,7 @@
  */
 
 #include <net/common/NetworkEventManager.h>
-#include <net/TestTCPServer.h>
+#include <net/tests/TestTCPServer.h>
 
 #include "tcp/server/ServerListener.h"
 

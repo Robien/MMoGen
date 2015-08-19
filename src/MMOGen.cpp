@@ -5,12 +5,12 @@
  *      Author: rguyard
  */
 
-#include <net/TestTCPClient.h>
-#include <net/TestTCPLoginClient.h>
-#include <net/TestTCPServer.h>
+#include <net/tests/TestTCPClient.h>
+#include <net/tests/TestTCPLoginClient.h>
+#include <net/tests/TestTCPServer.h>
 #include <iostream>
-#include "net/TestTcp.h"
-#include "net/UnityPolicyServer.h"
+#include "net/tests/TestTcp.h"
+#include "net/Unity/UnityPolicyServer.h"
 
 #include "net/game/LoginServer.h"
 
