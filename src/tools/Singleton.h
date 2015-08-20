@@ -36,13 +36,13 @@ public:
 	{
 		if (instance == 0x0)
 		{
-			sem_wait(mutex);
+			mutex.lock();
 			if (instance == 0x0)
 			{
 				instance = new T();
 				static_cast<Singleton*>(instance)->onInit();
 			}
-			sem_post(mutex);
+			mutex.unlock();
 		}
 		return instance;
 	}

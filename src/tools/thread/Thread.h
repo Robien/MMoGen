@@ -1,8 +1,10 @@
 #ifndef UTIL_THREAD_H
 #define UTIL_THREAD_H
 
-#include <pthread.h>
+#include <boost/thread.hpp>
 #include <sched.h>
+
+#define USE_PTHREAD true
 
 class Thread
 {
@@ -19,15 +21,11 @@ public:
 	 */
 	bool join();
 	/**
-	 * Return an identifier for this thread.
-	 */
-	unsigned long id();
-	/**
 	 * Yield the cpu to any other runnable threads.
 	 */
 	void yield();
 	//try to cancel a thread
-	void cancel();
+	bool cancel();
 	/**
 	 * Set the thread priority.
 	 * @param priority The priority value to set. You should check the range of priority values
@@ -50,7 +48,7 @@ protected:
 	static void* callback(void* arg);
 	virtual void run() = 0;
 private:
-	pthread_t mThread;
+	boost::thread thread;
 	bool mRunning;
 };
 

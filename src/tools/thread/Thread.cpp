@@ -2,15 +2,8 @@
 #include <iostream>
 
 Thread::Thread() :
-		mThread(0), mRunning(false)
+		mRunning(false)
 {
-}
-
-void* Thread::callback(void* arg)
-{
-	Thread* thread = static_cast<Thread*>(arg);
-	thread->run();
-	return NULL;
 }
 
 Thread::~Thread()
@@ -19,8 +12,8 @@ Thread::~Thread()
 
 bool Thread::start()
 {
-	int ret = pthread_create(&mThread, NULL, callback, this);
-	mRunning = (ret == 0);
+	thread = boost::thread(&Thread::run, this);
+	mRunning = true;
 	return mRunning;
 }
 
@@ -30,52 +23,52 @@ bool Thread::join()
 	{
 		return false;
 	}
-	int ret = pthread_join(mThread, NULL);
-	if (ret == 0)
-	{
-		mRunning = false;
-		return true;
-	}
-	return false;
-}
-
-unsigned long Thread::id()
-{
-	return (unsigned long) mThread;
+	thread.join();
+	mRunning = false;
+	return true;
 }
 
 void Thread::yield()
 {
-	sched_yield();
+	boost::thread::yield();
 }
 
 bool Thread::setPriority(int priority)
 {
+	bool ret = false;
+#if USE_PTHREAD
+	boost::thread_attributes attr;
+
 	struct sched_param params;
 	params.sched_priority = priority;
-	int ret = pthread_setschedparam(mThread, SCHED_FIFO, &params);
-	return ret == 0;
+	ret = (pthread_setschedparam(thread.native_handle(), SCHED_FIFO, &params) == 0);
+#endif
+	return ret;
 }
 bool Thread::setRealTimePriority()
 {
+	bool ret = false;
+#if USE_PTHREAD
 	struct sched_param params;
 	params.sched_priority = sched_get_priority_max(SCHED_FIFO);
-	int ret = pthread_setschedparam(mThread, SCHED_FIFO, &params);
-	return ret == 0;
+	ret = (pthread_setschedparam(thread.native_handle(), SCHED_FIFO, &params) == 0);
+#endif
+	return ret;
 }
 bool Thread::setName(const char* name)
 {
-	if (pthread_setname_np(mThread, name) == 0)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	bool ret = false;
+#if USE_PTHREAD
+	ret = (pthread_setname_np(thread.native_handle(), name) == 0);
+#endif
+	return ret;
 }
 
-void Thread::cancel()
+bool Thread::cancel()
 {
-	pthread_cancel(mThread);
+#if USE_PTHREAD
+	pthread_cancel (thread.native_handle());
+	return true;
+#endif
+	return false;
 }
