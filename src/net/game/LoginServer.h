@@ -9,9 +9,9 @@
 #define LOGINSERVER_H_
 
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include <net/game/Client.h>
 #include <random/RandomGenerator.h>
-#include <thread/MutexAuto.h>
 #include <time/FormattedDate.h>
 #include "net/common/NetworkEventReceiver.h"
 #include "net/common/NetworkManager.h"
@@ -58,7 +58,7 @@ private:
 	float totalSecondPlayed;
 
 private:
-	MutexAuto mutexInterClient;
+	boost::mutex mutexInterClient;
 
 private:
 	RandomGenerator random;

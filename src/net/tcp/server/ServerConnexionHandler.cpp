@@ -12,12 +12,13 @@
 #include <boost/bind.hpp>
 #include <net/common/NetworkEvent.h>
 #include <net/common/NetworkEventManager.h>
+#include <unistd.h>
+#include "ServerClientManager.h"
 
-using boost::asio::socket_base;
-
-ServerConnexionHandler::ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager, bool raw) :
+ServerConnexionHandler::ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager, bool raw,
+		ServerClientManager* connectionManager) :
 		socket(socket), manager(manager), id(manager->getNewId()), messagesToSend(new SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> >()), raw(
-				raw)
+				raw), connectionManager(connectionManager)
 {
 	readHeader();
 	handler();
@@ -26,6 +27,21 @@ ServerConnexionHandler::ServerConnexionHandler(boost::asio::ip::tcp::socket* soc
 
 ServerConnexionHandler::~ServerConnexionHandler()
 {
+	try
+	{
+		socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+	} catch (boost::system::system_error& e)
+	{
+		std::cerr << "error socket shutdown : " << e.what() << " error code " << e.code().value() << std::endl;
+	}
+	try
+	{
+		socket->close();
+	} catch (boost::system::system_error& e)
+	{
+		std::cerr << "error socket close : " << e.what() << " error code " << e.code().value() << std::endl;
+	}
+	sleep(1);
 }
 
 void ServerConnexionHandler::handler()
@@ -68,22 +84,9 @@ void ServerConnexionHandler::run()
 	NetworkEvent event(NetworkEvent::DISCONECTION);
 	event.id = id;
 	manager->getNetworkEventManager()->onEvent(event);
-	try
-	{
-		socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-	} catch (boost::system::system_error& e)
-	{
-		std::cerr << "error socket shutdown : " << e.what() << std::endl;
-	}
-	try
-	{
-		socket->close();
-	} catch (boost::system::system_error& e)
-	{
-		std::cerr << "error socket close : " << e.what() << std::endl;
-	}
 	manager->removeBuffer(id);
 	std::cout << "id " << id << " has been disconnected" << std::endl;
+	connectionManager->stopConnection(socket);
 }
 
 void ServerConnexionHandler::readHeader()
@@ -163,7 +166,10 @@ void ServerConnexionHandler::handle_read(const boost::system::error_code& error,
 }
 void ServerConnexionHandler::endConnection()
 {
-	boost::shared_ptr<NetworkMessageOut> message(new NetworkMessageOut(true));
-	messagesToSend->add(message);
+	if (socket->is_open())
+	{
+		boost::shared_ptr<NetworkMessageOut> message(new NetworkMessageOut(true));
+		messagesToSend->add(message);
+	}
 }
 

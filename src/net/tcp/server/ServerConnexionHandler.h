@@ -17,10 +17,12 @@
 
 #include "net/common/NetworkManager.h"
 
+class ServerClientManager;
+
 class ServerConnexionHandler: public Thread
 {
 public:
-	ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager, bool raw);
+	ServerConnexionHandler(boost::asio::ip::tcp::socket* socket, NetworkManager* manager, bool raw, ServerClientManager* connectionManager);
 	virtual ~ServerConnexionHandler();
 
 	void readHeader();
@@ -45,6 +47,7 @@ private:
 	boost::array<char, MAX_SIZE_PACKET> network_buffer;
 	boost::array<char, 4> network_buffer_header;
 	bool raw;
+	ServerClientManager* connectionManager;
 };
 
 #endif /* SERVERCONNEXIONHANDLER_H_ */

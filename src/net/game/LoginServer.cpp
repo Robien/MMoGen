@@ -123,6 +123,7 @@ void LoginServer::onEvent(NetworkEvent& event)
 }
 void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
+	mutexInterClient.lock();
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client = clients.find(message->getSenderId());
 
 	if (client == clients.end())
@@ -135,9 +136,7 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 		{
 		case loginServer::Client::CONNECTED:
 			client->second->printStatus();
-			mutexInterClient.lock();
 			computeMMMessage(message, client);
-			mutexInterClient.unlock();
 			client->second->printStatus();
 			break;
 		case loginServer::Client::IN_MM:
@@ -145,15 +144,11 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		case loginServer::Client::WAITING_FOR_READY:
 			client->second->printStatus();
-			mutexInterClient.lock();
 			computeREADYMessage(message, client);
-			mutexInterClient.unlock();
 			client->second->printStatus();
 			break;
 		case loginServer::Client::READY:
-			mutexInterClient.lock();
 			client->second->printStatus();
-			mutexInterClient.unlock();
 			break;
 		case loginServer::Client::INGAME:
 			//TODO : avoid copy
@@ -191,6 +186,7 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		}
 	}
+	mutexInterClient.unlock();
 }
 
 void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
