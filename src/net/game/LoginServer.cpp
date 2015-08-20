@@ -36,10 +36,10 @@ LoginServer::~LoginServer()
 
 void LoginServer::onEvent(NetworkEvent& event)
 {
+	mutexInterClient.lock();
 	if (event.typeEvent == NetworkEvent::CONNECTION)
 	{
 		std::cout << "[EVENT] connection id : " << event.id << std::endl;
-		mutexInterClient.lock();
 		std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::iterator client = clients.find(event.id);
 
 		if (client != clients.end())
@@ -47,16 +47,12 @@ void LoginServer::onEvent(NetworkEvent& event)
 			std::cout << " ... [E] client with id " << event.id << " is already known" << std::endl;
 			clients.erase(client);
 		}
-		mutexInterClient.unlock();
 		boost::shared_ptr<loginServer::Client> clientPtr(new loginServer::Client(event.id));
 		clientPtr->setIsConnected(true);
-		mutexInterClient.lock();
 		clients.insert(std::pair<unsigned int, boost::shared_ptr<loginServer::Client> >(event.id, clientPtr));
-		mutexInterClient.unlock();
 	}
 	else //disconnection
 	{
-		mutexInterClient.lock();
 		std::cout << "[EVENT] disconnection id : " << event.id << std::endl;
 		if (waiting.get() != NULL && waiting->getId() == event.id)
 		{
@@ -71,16 +67,15 @@ void LoginServer::onEvent(NetworkEvent& event)
 		}
 		else
 		{
-			std::map<std::string, boost::shared_ptr<loginServer::Client> >::const_iterator other = clientsWaitingForSomeone.find(client->second->getName());
+			std::map<std::string, boost::shared_ptr<loginServer::Client> >::const_iterator other = clientsWaitingForSomeone.find(
+					client->second->getName());
 			if (other != clientsWaitingForSomeone.end())
 			{
 				clientsWaitingForSomeone.erase(other->first);
 			}
 
-
 			if (client->second->getStatus() == loginServer::Client::INGAME || client->second->getStatus() == loginServer::Client::ALONE)
 			{
-				nbPlayerInGame--;
 				if (client->second->getStatus() == loginServer::Client::INGAME)
 				{
 					totalSecondPlayed += client->second->getGameTimer()->getValueinSecond();
@@ -105,8 +100,8 @@ void LoginServer::onEvent(NetworkEvent& event)
 						else
 						{
 							nbGame--;
+							nbPlayerInGame -= 2;
 						}
-						std::cout << "nbGame-- = " << nbGame << std::endl;
 					}
 				}
 				else
@@ -120,15 +115,14 @@ void LoginServer::onEvent(NetworkEvent& event)
 			}
 			clients.erase(client);
 		}
-		mutexInterClient.unlock();
 
 		std::cout << "[EVENT] disconnection done id : " << event.id << std::endl;
 
 	}
+	mutexInterClient.unlock();
 }
 void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 {
-	mutexInterClient.lock();
 	std::map<unsigned int, boost::shared_ptr<loginServer::Client> >::const_iterator client = clients.find(message->getSenderId());
 
 	if (client == clients.end())
@@ -141,7 +135,9 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 		{
 		case loginServer::Client::CONNECTED:
 			client->second->printStatus();
+			mutexInterClient.lock();
 			computeMMMessage(message, client);
+			mutexInterClient.unlock();
 			client->second->printStatus();
 			break;
 		case loginServer::Client::IN_MM:
@@ -149,11 +145,15 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		case loginServer::Client::WAITING_FOR_READY:
 			client->second->printStatus();
+			mutexInterClient.lock();
 			computeREADYMessage(message, client);
+			mutexInterClient.unlock();
 			client->second->printStatus();
 			break;
 		case loginServer::Client::READY:
+			mutexInterClient.lock();
 			client->second->printStatus();
+			mutexInterClient.unlock();
 			break;
 		case loginServer::Client::INGAME:
 			//TODO : avoid copy
@@ -165,15 +165,18 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 				mt.ParseFromArray(message->getData()->c_array(), message->getDataSize());
 				if (message->getSenderId() >= 100)
 				{
-					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "]-> [" << client->second->getFriend() << "]\t " << mt.ShortDebugString() << std::endl;
+					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "]-> [" << client->second->getFriend() << "]\t "
+							<< mt.ShortDebugString() << std::endl;
 				}
 				else if (message->getSenderId() >= 10)
 				{
-					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "] -> [" << client->second->getFriend() << "]\t " << mt.ShortDebugString() << std::endl;
+					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "] -> [" << client->second->getFriend() << "]\t "
+							<< mt.ShortDebugString() << std::endl;
 				}
 				else
 				{
-					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "]  -> [" << client->second->getFriend() << "]\t " << mt.ShortDebugString() << std::endl;
+					std::cout << time.currentDateTime() << "\t[" << message->getSenderId() << "]  -> [" << client->second->getFriend() << "]\t "
+							<< mt.ShortDebugString() << std::endl;
 				}
 			}
 
@@ -188,7 +191,6 @@ void LoginServer::onMessageReceived(boost::shared_ptr<NetworkMessage> message)
 			break;
 		}
 	}
-	mutexInterClient.unlock();
 }
 
 void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
@@ -214,16 +216,17 @@ void LoginServer::computeMMMessage(boost::shared_ptr<NetworkMessage> message,
 
 	if (nbGame < (unsigned int) Constants::get()->getInt("max-game"))
 	{
-		std::cout << "IS OK" << std::endl;
 		ack->set_isok(true);
 	}
 	else
 	{
-		std::cout << "IS NOT OK" << std::endl;
 		ack->set_isok(false);
 		client->second->setIsAlone();
-	}
 
+		std::string ackStr = cmsAck.SerializeAsString();
+		getManager().sendMessage(NetworkMessageOut::factory(message->getSenderId(), ackStr));
+		return;
+	}
 	std::string ackStr = cmsAck.SerializeAsString();
 	getManager().sendMessage(NetworkMessageOut::factory(message->getSenderId(), ackStr));
 
@@ -333,7 +336,6 @@ void LoginServer::startGame(std::map<unsigned int, boost::shared_ptr<loginServer
 {
 	averageWaitingTime = averageWaitingTime * (2 * totalNbGame) + player1->second->getWaitingTime() + player2->second->getWaitingTime();
 	nbGame++;
-	std::cout << "nbGame++ " << nbGame << std::endl;
 	totalNbGame++;
 	nbPlayerInGame += 2;
 	averageWaitingTime /= (2 * totalNbGame);
