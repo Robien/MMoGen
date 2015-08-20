@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 	boost::program_options::notify(vm);
 
 	Constants::get()->add("exit-as-soon-as-you-can", (bool) vm.count("exit-as-soon-as-you-can"));
-	Constants::get()->add("max-game", (int) vm.count("max-game"));
+	Constants::get()->add("max-game", (int) vm["max-game"].as<int>());
 
 	if (vm.count("help"))
 	{
