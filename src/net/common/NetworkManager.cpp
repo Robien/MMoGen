@@ -24,7 +24,6 @@ NetworkManager::NetworkManager(WebServer* webserver) :
 	}
 }
 
-
 NetworkManager::~NetworkManager()
 {
 }
@@ -96,29 +95,53 @@ void NetworkManager::reportNewBuffer(unsigned int id, boost::shared_ptr<Synchron
 	event.id = id;
 	getNetworkEventManager()->onEvent(event);
 }
+
+void NetworkManager::reportNewWriter(unsigned int id, NetworkWriter* writer)
+{
+	mutexId.lock();
+	idWriterMap[id] = writer;
+	mutexId.unlock();
+	NetworkEvent event(NetworkEvent::CONNECTION);
+	event.id = id;
+	getNetworkEventManager()->onEvent(event);
+}
+
 void NetworkManager::removeBuffer(unsigned int id)
 {
 	mutexId.lock();
 	idMap.erase(id);
 	mutexId.unlock();
 }
+void NetworkManager::removeWriter(unsigned int id)
+{
+	mutexId.lock();
+	idWriterMap.erase(id);
+	mutexId.unlock();
+}
 void NetworkManager::sendMessage(boost::shared_ptr<NetworkMessageOut> message)
 {
 	mutexId.lock();
-	if (message.get() == NULL)
-	{
-		std::cerr << "ERROR NULL" << std::endl;
-	}
-	std::map<unsigned int, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > >::const_iterator buf = idMap.find(
-			message->getReceiverId());
+	std::map<unsigned int, NetworkWriter* >::const_iterator writer = idWriterMap.find(message->getReceiverId());
 	mutexId.unlock();
-	if (buf != idMap.end())
+	if (writer != idWriterMap.end())
 	{
-		buf->second->add(message);
+		writer->second->writeToNet(message);
 	}
 	else
 	{
-		std::cerr << "message can't be send : remote client disconnected" << std::endl;
+		std::cerr << "sendMessage DEPRECATED" << std::endl;
+		mutexId.lock();
+		std::map<unsigned int, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > >::const_iterator buf = idMap.find(
+				message->getReceiverId());
+		mutexId.unlock();
+		if (buf != idMap.end())
+		{
+			buf->second->add(message);
+		}
+		else
+		{
+			std::cerr << "message can't be send : remote client disconnected" << std::endl;
+		}
 	}
 }
 
@@ -151,7 +174,7 @@ float** NetworkManager::getTotalSecondPlayedPtr()
 
 float keepOnlyTwoDecimal(float nb)
 {
-	return (((float)(std::floor((nb*100)))) / (float) 100);
+	return (((float) (std::floor((nb * 100)))) / (float) 100);
 }
 
 std::string NetworkManager::getJSONData()

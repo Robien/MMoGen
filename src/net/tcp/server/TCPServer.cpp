@@ -44,7 +44,7 @@ void TCPServer::listen()
 					std::cerr << "io.run error : " << e.what() << std::endl;
 				}
 				io.reset();
-				exit(0); //TEMP kill the server to be sure to not being blocked in a infinite loop
+//				exit(0); //TEMP kill the server to be sure to not being blocked in a infinite loop
 			}
 		} catch (std::exception& e)
 		{

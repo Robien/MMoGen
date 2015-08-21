@@ -22,11 +22,14 @@ ServerConnexionHandler::ServerConnexionHandler(boost::asio::ip::tcp::socket* soc
 {
 	readHeader();
 	handler();
-	manager->reportNewBuffer(id, messagesToSend);
+	manager->reportNewWriter(id, this);
+	sendPending = false;
+	stopping = false;
 }
 
 ServerConnexionHandler::~ServerConnexionHandler()
 {
+	std::cout << "~ServerConnexionHandler()" << std::endl;
 	try
 	{
 		socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
@@ -41,52 +44,69 @@ ServerConnexionHandler::~ServerConnexionHandler()
 	{
 		std::cerr << "error socket close : " << e.what() << " error code " << e.code().value() << std::endl;
 	}
-	sleep(1);
+	std::cout << "~ServerConnexionHandler() finish" << std::endl;
 }
 
 void ServerConnexionHandler::handler()
 {
-	start();
+///	start();
 }
-void ServerConnexionHandler::run()
+void ServerConnexionHandler::writeToNet(boost::shared_ptr<NetworkMessageOut> message)
 {
-	try
+	if (message->isEndConnectionMessage())
 	{
-		bool running = true;
-		while (running)
-		{
-			boost::shared_ptr<NetworkMessageOut> message = messagesToSend->get();
-			if (message->isEndConnectionMessage())
-			{
-				running = false;
-			}
-			else
-			{
-				if (!message->isRaw())
-				{
-					unsigned int value = message->getData()->size();
-					std::string msgSize;
-					msgSize.push_back((value >> 24) & 0xFF);
-					msgSize.push_back((value >> 16) & 0xFF);
-					msgSize.push_back((value >> 8) & 0xFF);
-					msgSize.push_back((value) & 0xFF);
-
-					socket->send(boost::asio::buffer(msgSize));
-				}
-				socket->send(boost::asio::buffer(*message->getData()));
-			}
-		}
-	} catch (boost::system::system_error& e)
-	{
-		std::cerr << "error with the TCP connection : " << e.what() << std::endl;
+		std::cout << "DEPRECATED isEndConnectionMessage" << std::endl;
+		endConnection();
+		return;
 	}
-	manager->removeId(id);
-	NetworkEvent event(NetworkEvent::DISCONECTION);
-	event.id = id;
-	manager->getNetworkEventManager()->onEvent(event);
-	manager->removeBuffer(id);
-	std::cout << "id " << id << " has been disconnected" << std::endl;
-	connectionManager->stopConnection(socket);
+
+	if (!message->isRaw())
+	{
+		unsigned int value = message->getData()->size();
+		boost::shared_ptr<std::string> msgSize(new std::string());
+		msgSize->push_back((value >> 24) & 0xFF);
+		msgSize->push_back((value >> 16) & 0xFF);
+		msgSize->push_back((value >> 8) & 0xFF);
+		msgSize->push_back((value) & 0xFF);
+		messagesToSendV2.push(msgSize);
+	}
+	messagesToSendV2.push(message->getData());
+	writeOne();
+
+}
+
+void ServerConnexionHandler::writeOne()
+{
+	if (sendPending || stopping || !socket || !socket->is_open())
+	{
+		return;
+	}
+	if (messagesToSendV2.size() == 0)
+	{
+		sendPending = false;
+		return;
+	}
+	sendPending = true;
+	currDataSend = messagesToSendV2.front();
+	messagesToSendV2.pop();
+	socket->async_send(boost::asio::buffer(currDataSend->c_str(), currDataSend->size()),
+			boost::bind(&ServerConnexionHandler::handlerWrite, this, boost::asio::placeholders::error(),
+					boost::asio::placeholders::bytes_transferred()));
+
+}
+
+void ServerConnexionHandler::handlerWrite(const boost::system::error_code& error, std::size_t bytes_transferred)
+{
+	if (!error)
+	{
+		sendPending = false;
+		writeOne();
+	}
+	else
+	{
+		std::cerr << "Error write : " << error.message() << std::endl;
+		endConnection();
+	}
 }
 
 void ServerConnexionHandler::readHeader()
@@ -166,10 +186,38 @@ void ServerConnexionHandler::handle_read(const boost::system::error_code& error,
 }
 void ServerConnexionHandler::endConnection()
 {
-	if (socket->is_open())
+	if (stopping)
 	{
-		boost::shared_ptr<NetworkMessageOut> message(new NetworkMessageOut(true));
-		messagesToSend->add(message);
+		return;
+	}
+	stopping = true;
+	sendPending = true;
+	if (socket && socket->is_open())
+	{
+		manager->removeWriter(id);
+		manager->removeId(id);
+		NetworkEvent event(NetworkEvent::DISCONECTION);
+		event.id = id;
+		manager->getNetworkEventManager()->onEvent(event);
+//		manager->removeBuffer(id);
+		std::cout << "id " << id << " has been disconnected" << std::endl;
+//		connectionManager->stopConnection(socket);
+
+		try
+		{
+			socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+		} catch (boost::system::system_error& e)
+		{
+			std::cerr << "error socket shutdown : " << e.what() << " error code " << e.code().value() << std::endl;
+		}
+		try
+		{
+			socket->close();
+		} catch (boost::system::system_error& e)
+		{
+			std::cerr << "error socket close : " << e.what() << " error code " << e.code().value() << std::endl;
+		}
+
 	}
 }
 

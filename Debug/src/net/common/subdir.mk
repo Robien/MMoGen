@@ -9,7 +9,8 @@ CPP_SRCS += \
 ../src/net/common/NetworkEventReceiver.cpp \
 ../src/net/common/NetworkManager.cpp \
 ../src/net/common/NetworkMessage.cpp \
-../src/net/common/NetworkMessageOut.cpp 
+../src/net/common/NetworkMessageOut.cpp \
+../src/net/common/NetworkWriter.cpp 
 
 OBJS += \
 ./src/net/common/NetworkEvent.o \
@@ -17,7 +18,8 @@ OBJS += \
 ./src/net/common/NetworkEventReceiver.o \
 ./src/net/common/NetworkManager.o \
 ./src/net/common/NetworkMessage.o \
-./src/net/common/NetworkMessageOut.o 
+./src/net/common/NetworkMessageOut.o \
+./src/net/common/NetworkWriter.o 
 
 CPP_DEPS += \
 ./src/net/common/NetworkEvent.d \
@@ -25,7 +27,8 @@ CPP_DEPS += \
 ./src/net/common/NetworkEventReceiver.d \
 ./src/net/common/NetworkManager.d \
 ./src/net/common/NetworkMessage.d \
-./src/net/common/NetworkMessageOut.d 
+./src/net/common/NetworkMessageOut.d \
+./src/net/common/NetworkWriter.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

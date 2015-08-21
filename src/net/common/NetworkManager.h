@@ -9,6 +9,7 @@
 #define NETWORKMANAGER_H_
 
 #include <boost/asio.hpp>
+#include <common/NetworkWriter.h>
 #include <data/SynchonizedBuffer.h>
 #include <net/common/NetworkEventManager.h>
 #include <net/common/NetworkMessageOut.h>
@@ -34,7 +35,9 @@ public:
 
 public:
 	void reportNewBuffer(unsigned int id, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > buff);
+	void reportNewWriter(unsigned int id, NetworkWriter* writer);
 	void removeBuffer(unsigned int id);
+	void removeWriter(unsigned int id);
 	void sendMessage(boost::shared_ptr<NetworkMessageOut> message);
 
 public:
@@ -73,6 +76,7 @@ private:
 	std::vector<unsigned int> anusedId;
 
 	std::map<unsigned int, boost::shared_ptr<SynchronizedBuffer<boost::shared_ptr<NetworkMessageOut> > > > idMap;
+	std::map<unsigned int, NetworkWriter* > idWriterMap;
 
 private:
 	NetworkEventManager networkEventManager;
